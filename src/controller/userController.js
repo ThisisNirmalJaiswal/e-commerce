@@ -37,7 +37,7 @@ const createUser = async function(req, res){
         email: email,
         profileImage: uploadedProfilePictureUrl,
         phone: phone,
-        password: password,
+        password: this.password,
         address: address,
       };
       // registering a new user
