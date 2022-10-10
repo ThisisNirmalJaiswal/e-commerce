@@ -9,6 +9,6 @@ router.get("/testme",function(req,res){
 
 router.post("/register", userController.createUser)
 
-
+router.post("/login",userController.login)
 
 module.exports = router

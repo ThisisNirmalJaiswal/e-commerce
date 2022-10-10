@@ -26,11 +26,11 @@ const userSchema = new mongoose.Schema({
 module.exports = mongoose.model('user',userSchema)
 
 
-userSchema.pre('save', async function(next){
-  if(this.isModified('password')){
-    this.password = bycrypt.hash(thispassword,10);
-  }next()
-})
+// userSchema.pre('save', async function(next){
+//   if(this.isModified('password')){
+//     this.password = bycrypt.hash(thispassword,10);
+//   }next()
+//})
 
 
 
