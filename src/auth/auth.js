@@ -5,14 +5,26 @@ const mongoose = require("mongoose")
 const isValidObjectId = function (objectid) {
     return mongoose.Types.ObjectId.isValid(objectid)
 }
+
+const verifyToken = function (req, res, next) {
+  const bearerHeader = req.headers['authorization'];
+
+  if (bearerHeader) {
+    const bearer = bearerHeader.split(' ');
+    const bearerToken = bearer[1];
+    req.token = bearerToken;
+    
+    next();
+  } else {
+    // Forbidden
+    res.sendStatus(403);
+  }
+}
+
 const authentication = function (req, res, next) {
     try {
-        let token = req.headers["authorization"];
-        
-        if (!token) {
-            return res.status(400).send({ status: false, msg: "Please!! Enter a Token in Bearer. :(" })
-        }
-         jwt.verify(token, "project5",  (err, decoded)=> {
+       
+         jwt.verify(req.token, "project5",  (err, decoded)=> {
             if (err) {
                 return res.status(401).send({ status: false, error:  err.message})
             } else {
@@ -54,4 +66,4 @@ const authorization = async function (req , res , next){
   }
   }
 
-module.exports = {authentication , authorization}
+module.exports = {authentication , authorization, verifyToken}
