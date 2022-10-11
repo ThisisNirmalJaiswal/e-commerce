@@ -7,12 +7,12 @@ const isValidObjectId = function (objectid) {
 }
 const authentication = function (req, res, next) {
     try {
-        let token = req.headers["authorization"];
-        console.log(token)
+        let token = req.headers["x-api-key"];
+       
         if (!token) {
             return res.status(400).send({ status: false, msg: "Please!! Enter a Token in Bearer. :(" })
         }
-         jwt.verify(token, "group58-productsManagement", function (err, decoded) {
+         jwt.verify(token, "project5",  (err, decoded)=> {
             if (err) {
                 return res.status(401).send({ status: false, error:  err.message})
             } else {
@@ -21,6 +21,7 @@ const authentication = function (req, res, next) {
                 next()
             }
         });
+        
     } catch (err) {
         console.log("This is the error :", err.message)
         res.status(500).send({ msg: "Congrats!!, You messesd Up. :(", error: err.message })
@@ -30,22 +31,22 @@ const authorization = async function (req , res , next){
   try{
    
     let userId = req.userId
-    let userIdFromParam = req.params.userId
-    if (!isValidObjectId(userIdFromParam)) {
+    req.userIdFromParam = req.params.userId
+    if (!isValidObjectId(req.userIdFromParam)) {
       return res
         .status(400)
         .send({ status: false, message: " Please!! input a valid Id :(" });
     }
+    if(req["tokenUserId"]!=req.userIdFromParam) return  res.status(403).send({message:"Sorry!! You are not AUTHORISED"})
 
-    const userByUserId = await userModel.findById(userIdFromParam)
 
-    if (!userByUserId) {
+    req.userByUserId = await userModel.findById(req.userIdFromParam)
+
+    if (!req.userByUserId) {
       return res.status(404).send({ status: false, message: " User not found!!!" })
   }
 
-    if(userId!=userIdFromParam)
-    return res.status(403).send({ status: false, message: " Ohhho!! You are not AUTHORISED" })
-
+    
     next()
   }
   catch(err){
