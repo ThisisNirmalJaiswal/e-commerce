@@ -2,7 +2,6 @@ const express = require("express");
 const route = require("./routes/routes");
 const mongoose = require("mongoose");
 const multer = require("multer");
-const aws= require("aws-sdk")
 const app = express();
 
 app.use(express.json());
@@ -21,6 +20,6 @@ mongoose
 
 app.use("/", route);
 
-app.listen(process.env.PORT || 3000, function () {
-  console.log("Express app running on port " + (process.env.PORT || 3000));
-})
+app.listen(3000, function () {
+  console.log("Express app running on port 3000")
+});

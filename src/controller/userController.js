@@ -264,6 +264,7 @@ const updateUser = async function (req, res) {
     let filter = {};
     let { fname, lname, email, phone, password, address } = requestBody;
     let profileImage = req.files;
+    if(!profileImage){
 
     if (profileImage && profileImage.length > 0) {
       //upload to s3 and get the uploaded link
@@ -272,14 +273,15 @@ const updateUser = async function (req, res) {
       var updatedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
       //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
     } else {
-      res.status(400).send({ msg: "No file found" });
+     return res.status(400).send({ msg: "No file found" });
     }
-
+    filter.profileImage = updatedProfilePictureUrl;
+    }
     if (fname) filter.fname = fname;
     if (lname) filter.lname = lname;
     if (email) filter.email = email;
     if (phone) filter.phone = phone;
-    const isUnique = await bookModel.find({
+    const isUnique = await userModel.find({
       $or: [{ email: email }, { phone: phone }],
     });
     if (isUnique.length >= 1) {
@@ -307,17 +309,17 @@ const updateUser = async function (req, res) {
 
       filter.password = encryptedPassword;
     }
-    if (profileImage) filter.profileImage = updatedProfilePictureUrl;
+    // if (profileImage) filter.profileImage = updatedProfilePictureUrl;
 
-    if (address.shipping.street)
-      address.shipping.street = address.shipping.street;
-    if (address.shipping.city) address.shipping.city = address.shipping.city;
-    if (address.shipping.pincode)
-      address.shipping.pincode = address.shipping.pincode;
-    if (address.billing.street) address.billing.street = address.billing.street;
-    if (address.billing.city) address.billing.city = address.billing.city;
-    if (address.billing.pincode)
-      address.billing.pincode = address.billing.pincode;
+    // if (address.shipping.street)
+    //   address.shipping.street = address.shipping.street;
+    // if (address.shipping.city) address.shipping.city = address.shipping.city;
+    // if (address.shipping.pincode)
+    //   address.shipping.pincode = address.shipping.pincode;
+    // if (address.billing.street) address.billing.street = address.billing.street;
+    // if (address.billing.city) address.billing.city = address.billing.city;
+    // if (address.billing.pincode)
+    //   address.billing.pincode = address.billing.pincode;
 
     const updatedUser = await userModel.findByIdAndUpdate(
       req.userIdFromParam,

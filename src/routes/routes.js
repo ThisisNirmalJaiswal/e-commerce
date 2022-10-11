@@ -12,6 +12,6 @@ router.post("/register", userController.createUser)
 
 router.post("/login",userController.login)
 router.get("/user/:userId/profile", auth.verifyToken, auth.authentication,auth.authorization, userController.getUser)
-router.put("/user/:userId/profile", auth.authentication,auth.authorization, userController.updateUser)
+router.put("/user/:userId/profile", auth.verifyToken, auth.authentication,auth.authorization, userController.updateUser)
 
 module.exports = router
