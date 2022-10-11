@@ -347,7 +347,7 @@ const updateUser = async function (req, res) {
     );
 
     return res.status(200).send({
-      message: "yess...your details are updated successfully",
+      message: "yess!!your details are updated successfully",
       data: updatedUser,
     });
   } catch (err) {
