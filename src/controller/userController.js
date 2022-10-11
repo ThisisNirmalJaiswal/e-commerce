@@ -10,7 +10,7 @@ const createUser = async function (req, res) {
     const data = req.body;
 
     let profileImage = req.files;
-
+   
     //using destructuring
     let { fname, lname, email, phone, password, address } = data;
 
@@ -48,10 +48,10 @@ const createUser = async function (req, res) {
       return res.status(409).send({ message: "Email Already Registered..." });
     }
 
-    if (profileImage.length == 0)
-      return res
-        .status(400)
-        .send({ status: false, message: "Please upload profile image" });
+    // if (profileImage.length == 0)
+    //   return res
+    //     .status(400)
+    //     .send({ status: false, message: "Please upload profile image" });
 
     if (!data.phone)
       return res
@@ -149,9 +149,11 @@ const createUser = async function (req, res) {
       // res.send the link back to frontend/postman
       //let uploadedFileURL= await uploadFile( files[0] )
       var uploadedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
+      console.log(profileImage)
+
       //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
     } else {
-      res.status(400).send({ msg: "No file found" });
+     return res.status(400).send({ msg: "No file found" });
     }
 
     //console.log(uploadedProfilePictureUrl);
@@ -171,20 +173,20 @@ const createUser = async function (req, res) {
     // registering a new user
     const newUser = await userModel.create(userData);
 
-    res.status(201).send({
+    return res.status(201).send({
       status: true,
       message: "User successfully registered",
       data: newUser,
     });
   } catch (error) {
-    res.status(500).send({ error: error.message });
+    return res.status(500).send({ error: error.message });
   }
 };
 
 const login = async function (req, res) {
   try {
     requestBody = req.body;
-
+    
     if ((Object.keys(requestBody).length = 0)) {
       res.status(400).send({
         status: false,
@@ -201,12 +203,27 @@ const login = async function (req, res) {
     //Distructure
     const { email, password } = req.body;
     if (!email) {
-      res.status(400).send({ status: false, message: "EmailId is required" });
+      return res.status(400).send({ status: false, message: "EmailId is required" });
     }
+    
+    if (!validation.isValidEmail) {
+      return res
+        .status(400)
+        .status({ status: false, message: "Please enter email in valid format" });
+    }
+
     if (!password) {
-      res
+      return res
         .status(400)
         .status({ status: false, message: "Password is required" });
+    }
+    if (!validation.isValid(password)) return res.status(400).send({ status: false, message: 'email is mandatory' })
+
+
+    if (!validation.isValidPassword) {
+      return res
+        .status(400)
+        .status({ status: false, message: "Please inter password in valid format" });
     }
 
     let data = await userModel.findOne({ email: email });
@@ -229,12 +246,13 @@ const login = async function (req, res) {
       {
         userId: data._id.toString(),
         group: "group-58",
+        iat:Math.floor(Date.now() / 1000) 
       },
       "project5",
       expiresIn
     );
 
-    res.status(200).send({
+   return res.status(200).send({
       status: true,
       message: "user Login Successful",
       data: {
@@ -263,18 +281,20 @@ const updateUser = async function (req, res) {
     //fname,lname,email,phone,password,addressshipping-street,city,pincode,addresbilling
     let filter = {};
     let { fname, lname, email, phone, password, address } = requestBody;
-    let profileImage = req.files;
-    if(!profileImage){
-
-    if (profileImage && profileImage.length > 0) {
+    
+    if(req.files){
+      let profileImage = req.files
+      console.log(req.files)
+    if (profileImage!=undefined && profileImage.length > 0) {
       //upload to s3 and get the uploaded link
       // res.send the link back to frontend/postman
       //let uploadedFileURL= await uploadFile( files[0] )
       var updatedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
       //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
-    } else {
-     return res.status(400).send({ msg: "No file found" });
-    }
+      } 
+      //else {
+    //  return res.status(400).send({ msg: "No file found" });
+    // }
     filter.profileImage = updatedProfilePictureUrl;
     }
     if (fname) filter.fname = fname;
@@ -289,17 +309,17 @@ const updateUser = async function (req, res) {
         if (isUnique[0].email == email) {
           return res
             .status(400)
-            .send({ status: false, message: "title already exist" });
+            .send({ status: false, message: "email already exist" });
         }
         if (isUnique[0].phone == phone) {
           return res
             .status(400)
-            .send({ status: false, message: "ISBN already exist" });
+            .send({ status: false, message: "phone already exist" });
         }
       } else {
         return res
           .status(400)
-          .send({ status: false, message: "title and ISBN already exist" });
+          .send({ status: false, message: "email and phone already exist" });
       }
     }
 
@@ -309,17 +329,16 @@ const updateUser = async function (req, res) {
 
       filter.password = encryptedPassword;
     }
-    // if (profileImage) filter.profileImage = updatedProfilePictureUrl;
-
-    // if (address.shipping.street)
-    //   address.shipping.street = address.shipping.street;
-    // if (address.shipping.city) address.shipping.city = address.shipping.city;
-    // if (address.shipping.pincode)
-    //   address.shipping.pincode = address.shipping.pincode;
-    // if (address.billing.street) address.billing.street = address.billing.street;
-    // if (address.billing.city) address.billing.city = address.billing.city;
+    
+    // if (address["shipping"]["street"])
+    // filter["address"]["shipping"]["street"] = address["shipping"]["street"];
+    // if (address["shipping"]["city"]) filter["address"]["shipping"]["city"] = address["shipping"]["city"];
+    // if (address["shipping"] && address["shipping"]["pincode"])
+    // filter["address"]["shipping"]["pincode"]= address["shipping"]["pincode"];
+    // // if (address.billing.street) filter.address.billing.street = address.billing.street;
+    // if (address.billing.city) filter.address.billing.city = address.billing.city;
     // if (address.billing.pincode)
-    //   address.billing.pincode = address.billing.pincode;
+    //   filter.address.billing.pincode = address.billing.pincode;
 
     const updatedUser = await userModel.findByIdAndUpdate(
       req.userIdFromParam,

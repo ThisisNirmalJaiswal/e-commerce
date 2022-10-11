@@ -13,10 +13,10 @@ let uploadFile = async(file) => {
         var uploadParams= {
             ACL: "public-read",
             Bucket: "classroom-training-bucket", 
-            Key: "abcd/" + file.orginalname,  
+            Key: "abcd/" + file.originalname,  
             Body: file.buffer
         }
-    
+        
     
         s3.upload( uploadParams, function (err, data ){
             if(err) {
