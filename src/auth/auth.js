@@ -7,8 +7,8 @@ const isValidObjectId = function (objectid) {
 }
 const authentication = function (req, res, next) {
     try {
-        let token = req.headers["x-api-key"];
-       
+        let token = req.headers["authorization"];
+        
         if (!token) {
             return res.status(400).send({ status: false, msg: "Please!! Enter a Token in Bearer. :(" })
         }
