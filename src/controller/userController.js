@@ -269,7 +269,7 @@ const login = async function (req, res) {
         .status(400)
         .send({ status: false, message: "Password is incorrect" });
 
-    let expiresIn = { expiresIn: "1m" };
+    let expiresIn = { expiresIn: "48h" };
     let token = jwt.sign(
       {
         userId: data._id.toString(),

@@ -33,8 +33,9 @@ const isValidEmail = (Email) => {
   return  /^([A-Za-z0-9._]{3,}@[A-Za-z]{3,}[.]{1}[A-Za-z.]{2,6})+$/.test(Email)
 };
 
-const isValidPassword = (Password) => {
-  return /^(?=.?[A-Z])(?=.?[a-z])(?=.?[0-9])(?=.?[#?!@$%^&*-]).{8,15}$/.test(Password)
+const isValidPassword = (password) => {
+  return (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/.test(password))
+ 
 };
 
 const isValidObjectId = (objectId) => {
