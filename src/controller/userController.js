@@ -20,48 +20,38 @@ const createUser = async function (req, res) {
         message: "Please!! provide required details to create your account",
       });
 
-      if (!fname)
+    if (validation.isValid(data.fname))
       return res.status(400).send({
         status: false,
-        message: "First name must be contains only charachters",
+        message: "Please!! provide First name",
       });
 
-    if (!validation.isValid(fname))
+      if (!validation.isValidString(data.fname.trim()))
       return res.status(400).send({
         status: false,
-        message: "First name must be contains only charachters",
+        message: "First name must be a string",
       });
 
-      if (validation.isValidString(fname))
-      return res.status(400).send({
-        status: false,
-        message: "First name must be contains only charachters",
-      })
 
-      if (!lname)
-      return res.status(400).send({
-        status: false,
-        message: "First name must be contains only charachters",
-      });
-
-    if (validation.isValid(lname))
+    if (validation.isValid(data.lname))
       return res.status(400).send({
         status: false,
         message: "Last name must be contains only charachters",
       });
 
-    if (!email)
+      if (!validation.isValidString(data.lname.trim()))
+      return res.status(400).send({
+        status: false,
+        message: "last name must be a string",
+      });
+
+
+    if (!data.email)
       return res
         .status(400)
         .send({ status: false, message: "User email-id is required" });
 
-    if (!validation.isValid(email))
-      return res.status(400).send({
-        status: false,
-        message: "First name must be contains only charachters",
-      });
-
-    if (!validation.isValidEmail(email)) {
+    if (!validation.isValidEmail(data.email)) {
       return res
         .status(400)
         .send({ status: false, message: "User email is not valid" });
@@ -72,23 +62,17 @@ const createUser = async function (req, res) {
       return res.status(409).send({ message: "Email Already Registered..." });
     }
 
-    // if (profileImage.length == 0)
-    //   return res
-    //     .status(400)
-    //     .send({ status: false, message: "Please upload profile image" });
+    if (profileImage.length == 0)
+      return res
+        .status(400)
+        .send({ status: false, message: "Please upload profile image" });
 
-    if (!phone)
+    if (!data.phone)
       return res
         .status(400)
         .send({ status: false, message: "User phone number is required" });
 
-    if (!validation.isValid(phone)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Valid phone number is required" });
-    }
-
-    if (!validation.isValidPhone(phone)) {
+    if (!validation.isValidPhone(data.phone)) {                                  
       return res
         .status(400)
         .send({ status: false, message: "User phone number is not valid" });
@@ -100,40 +84,17 @@ const createUser = async function (req, res) {
       return res.status(409).send({ message: "Mobile Already Registered" });
     }
 
-    if (!password)
+    if (!data.password)
       return res
         .status(400)
         .send({ status: false, message: "Password is required" });
 
-    if (!validation.isValid(password)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Valid Password is requireed" });
-    }
-
-    if (!validation.isValidPassword(password)) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Correct format of password is required" });
-    }
-
-
-    if (!address)
+    if (!data.address)
       return res
         .status(400)
         .send({ status: false, message: "Address is required" });
 
-        if (!validation.isValid(address))
-         return res
-         .status(400)
-         .send({ status: false, message: 'address is mandatory' })
-
-        if (!(typeof address==='object'))
-        return res
-        .status(400)
-        .send({ status: false, message: 'address should be in object' })
-
-
+    
 
     //  checking if city is valid or not.
     if (!address && address.city && !isValidCity(address.city)) {
@@ -142,7 +103,7 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "Invalid city..." });
     }
 
-
+  
 
     if (!address["shipping"]["street"]) {
       return res
@@ -162,13 +123,13 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "pincode is required" });
     }
 
-    //  checking if pincode is valid or not.
-    if (address["shipping"] && address["shipping"]["pincode"] && !validation.isValidPincode(address["shipping"]["pincode"])) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Invalid pincode..." });
-    }
-
+      //  checking if pincode is valid or not.
+      if (address["shipping"] && address["shipping"]["pincode"] && !validation.isValidPincode(address["shipping"]["pincode"])) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Invalid pincode..." });
+      }
+  
 
 
     if (!address["billing"]["street"]) {
@@ -189,24 +150,22 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "pincode is required" });
     }
 
-    //  checking if pincode is valid or not.
-    if (address["billing"] && address["billing"]["pincode"] && !validation.isValidPincode(address["billing"]["pincode"])) {
-      return res
-        .status(400)
-        .send({ status: false, message: "Invalid pincode..." });
-    }
-
+       //  checking if pincode is valid or not.
+       if (address["billing"] && address["billing"]["pincode"] && !validation.isValidPincode(address["billing"]["pincode"])) {
+        return res
+          .status(400)
+          .send({ status: false, message: "Invalid pincode..." });
+      }
+  
 
     if (profileImage && profileImage.length > 0) {
       //upload to s3 and get the uploaded link
       // res.send the link back to frontend/postman
       //let uploadedFileURL= await uploadFile( files[0] )
       var uploadedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
-      console.log(profileImage)
-
       //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
     } else {
-      return res.status(400).send({ msg: "No file found" });
+      res.status(400).send({ msg: "No file found" });
     }
 
     //console.log(uploadedProfilePictureUrl);
@@ -219,22 +178,23 @@ const createUser = async function (req, res) {
       lname: lname,
       email: email,
       profileImage: uploadedProfilePictureUrl,
-      phone: parseInt(phone),
+      phone: phone,
       password: encryptedPassword,
       address: address,
     };
     // registering a new user
     const newUser = await userModel.create(userData);
 
-    return res.status(201).send({
+    res.status(201).send({
       status: true,
       message: "User successfully registered",
       data: newUser,
     });
   } catch (error) {
-    return res.status(500).send({ error: error.message });
+    res.status(500).send({ error: error.message });
   }
 };
+
 
 const login = async function (req, res) {
   try {
@@ -342,9 +302,6 @@ const updateUser = async function (req, res) {
       let profileImage = req.files
 
       if (profileImage != undefined && profileImage.length > 0) {
-
-        //upload to s3 and get the uploaded link
-        // res.send the link back to frontend/postman
 
         var updatedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
 
