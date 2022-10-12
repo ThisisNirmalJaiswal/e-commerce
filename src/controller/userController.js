@@ -99,11 +99,7 @@ const createUser = async function (req, res) {
 
     address = JSON.parse(address);
 
-    if (!(typeof address === 'object'))
-      return
-    res
-      .status(400)
-      .send({ status: false, message: 'address should be in object' })
+    
 
 
     if (!data.address)
