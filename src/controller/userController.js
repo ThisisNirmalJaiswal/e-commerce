@@ -1,5 +1,4 @@
 const userModel = require("../models/userModel");
-const aws = require("aws-sdk");
 const AWS = require("../awsfile/aws");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
