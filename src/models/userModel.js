@@ -6,7 +6,7 @@ const userSchema = new mongoose.Schema({
     lname: {type:String, required:true, trim:true},
     email: {type:String, required:true, unique:true, lowercase:true, trim:true},
     profileImage: {type:String, required:true, trim:true}, // s3 link
-    phone: {type:String, required:true, unique:true, trim:true}, 
+    phone: {type:Number, required:true, unique:true, trim:true}, 
     password: {type:String, required:true, trim:true, minLen:8, maxLen:15}, // encrypted password
     address: {
         shipping: {

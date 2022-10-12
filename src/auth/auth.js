@@ -17,7 +17,7 @@ const verifyToken = function (req, res, next) {
     next();
   } else {
     // Forbidden
-    res.sendStatus(403);
+    res.status(403).send({status:false, message:"NO token in bearer"});
   }
 }
 

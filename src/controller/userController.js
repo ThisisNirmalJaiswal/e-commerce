@@ -51,7 +51,7 @@ const createUser = async function (req, res) {
         .status(400)
         .send({ status: false, message: "User email-id is required" });
 
-    if (!validation.isValidEmail(data.email)) {
+    if (!validation.isValidEmail(data.email.trim())) {
       return res
         .status(400)
         .send({ status: false, message: "User email is not valid" });
@@ -343,9 +343,9 @@ const updateUser = async function (req, res) {
       filter.password = encryptedPassword;
     }
 
-    // if (address["shipping"]["street"])
-    // filter["address"]["shipping"]["street"] = address["shipping"]["street"];
-    // if (address["shipping"]["city"]) filter["address"]["shipping"]["city"] = address["shipping"]["city"];
+    if (address)
+    filter["address"]["shipping"]["street"] = address["shipping"]["street"];
+    //if (address["shipping"]["city"]) filter["address"]["shipping"]["city"] = address["shipping"]["city"];
     // if (address["shipping"] && address["shipping"]["pincode"])
     // filter["address"]["shipping"]["pincode"]= address["shipping"]["pincode"];
     // // if (address.billing.street) filter.address.billing.street = address.billing.street;
