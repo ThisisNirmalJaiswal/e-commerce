@@ -16,5 +16,6 @@ router.get("/user/:userId/profile", auth.verifyToken, auth.authentication,auth.a
 router.put("/user/:userId/profile", auth.verifyToken, auth.authentication,auth.authorization, userController.updateUser)
 
 router.post("/products",productController.createProduct);
+router.get("/products",productController.getProduct);
 
 module.exports = router
