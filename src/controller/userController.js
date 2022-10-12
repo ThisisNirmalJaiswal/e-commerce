@@ -1,4 +1,5 @@
 const userModel = require("../models/userModel");
+const aws = require("aws-sdk");
 const AWS = require("../awsfile/aws");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -88,42 +89,50 @@ const createUser = async function (req, res) {
         .status(400)
         .send({ status: false, message: "Password is required" });
 
-    if (!data.address)
+        if (!validation.isValidPassword(data.password)) {
+          return res
+            .status(400)
+            .send({ status: false, message: "Please enter password in valid format" });
+        }
+    
+        
+    
+        address = JSON.parse(address);
+        
+        if (!data.address)
       return res
         .status(400)
         .send({ status: false, message: "Address is required" });
 
-    
-
+        
     //  checking if city is valid or not.
     if (!address && address.city && !isValidCity(address.city)) {
       return res
         .status(400)
         .send({ status: false, message: "Invalid city..." });
     }
-
-  
-
-    if (!address["shipping"]["street"]) {
+   // let { shipping, billing } = address;
+   
+    if (!address.shipping.street) {
       return res
         .status(400)
         .send({ status: false, message: "street is required" });
     }
 
-    if (!address["shipping"]["city"]) {
+    if (!address.shipping.city) {
       return res
         .status(400)
         .send({ status: false, message: "city is required" });
     }
 
-    if (!address["shipping"]["pincode"]) {
+    if (!address.shipping.pincode) {
       return res
         .status(400)
         .send({ status: false, message: "pincode is required" });
     }
 
       //  checking if pincode is valid or not.
-      if (address["shipping"] && address["shipping"]["pincode"] && !validation.isValidPincode(address["shipping"]["pincode"])) {
+      if (address.shipping && address.shipping.pincode && !validation.isValidPincode(address.shipping.pincode)) {
         return res
           .status(400)
           .send({ status: false, message: "Invalid pincode..." });
@@ -131,26 +140,26 @@ const createUser = async function (req, res) {
   
 
 
-    if (!address["billing"]["street"]) {
+    if (!address.billing.street) {
       return res
         .status(400)
         .send({ status: false, message: "street is required" });
     }
 
-    if (!address["billing"]["city"]) {
+    if (!address.billing.city) {
       return res
         .status(400)
         .send({ status: false, message: "city is required" });
     }
 
-    if (!address["billing"]["pincode"]) {
+    if (!address.billing.pincode) {
       return res
         .status(400)
         .send({ status: false, message: "pincode is required" });
     }
 
        //  checking if pincode is valid or not.
-       if (address["billing"] && address["billing"]["pincode"] && !validation.isValidPincode(address["billing"]["pincode"])) {
+       if (address.billing && address.billing.pincode&& !validation.isValidPincode(address.billing.pincode)) {
         return res
           .status(400)
           .send({ status: false, message: "Invalid pincode..." });
@@ -217,27 +226,25 @@ const login = async function (req, res) {
     if (!email) {
       return res.status(400).send({ status: false, message: "EmailId is required" });
     }
-    if (!validation.isValid(email)) return res.status(400).send({ status: false, message: 'email is mandatory' })
-
+   
 
     if (!validation.isValidEmail(email)) {
       return res
         .status(400)
-        .status({ status: false, message: "Please enter email in valid format" });
+        .send({ status: false, message: "Please enter email in valid format" });
     }
 
     if (!password) {
       return res
         .status(400)
-        .status({ status: false, message: "Password is required" });
+        .send({ status: false, message: "Password is required" });
     }
-    if (!validation.isValid(password)) return res.status(400).send({ status: false, message: 'email is mandatory' })
-
+   
 
     if (!validation.isValidPassword(password)) {
       return res
         .status(400)
-        .status({ status: false, message: "Please inter password in valid format" });
+        .send({ status: false, message: "Please inter password in valid format" });
     }
 
     let data = await userModel.findOne({ email: email });
@@ -255,7 +262,7 @@ const login = async function (req, res) {
         .status(400)
         .send({ status: false, message: "Password is incorrect" });
 
-    let expiresIn = { expiresIn: "24h" };
+    let expiresIn = { expiresIn: "1m" };
     let token = jwt.sign(
       {
         userId: data._id.toString(),
@@ -342,16 +349,21 @@ const updateUser = async function (req, res) {
       filter.password = encryptedPassword;
     }
 
-    if (address)
-    filter["address"]["shipping"]["street"] = address["shipping"]["street"];
-    //if (address["shipping"]["city"]) filter["address"]["shipping"]["city"] = address["shipping"]["city"];
-    // if (address["shipping"] && address["shipping"]["pincode"])
-    // filter["address"]["shipping"]["pincode"]= address["shipping"]["pincode"];
-    // // if (address.billing.street) filter.address.billing.street = address.billing.street;
-    // if (address.billing.city) filter.address.billing.city = address.billing.city;
-    // if (address.billing.pincode)
-    //   filter.address.billing.pincode = address.billing.pincode;
+ if (address){
 
+  address = JSON.parse(address);
+ 
+  if (address.shipping.street) filter["address.shipping.street"] = address.shipping.street;
+    if (address.shipping.city) filter["address.shipping.city"] = address.shipping.city;
+     
+    if (address.shipping.pincod)filter["address.shipping.pincode"]= address.shipping.pincode;
+      if (address.billing.street) filter["address.billing.street"] = address.billing.street;
+     if (address.billing.city) filter["address.billing.city"] = address.billing.city;
+     if (address.billing.pincode)
+      filter["address.billing.pincode"] = address.billing.pincode;
+
+
+ }
     const updatedUser = await userModel.findByIdAndUpdate(
       req.userIdFromParam,
       filter,
