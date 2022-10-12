@@ -352,16 +352,16 @@ const updateUser = async function (req, res) {
  if (address){
 
   address = JSON.parse(address);
- 
-  if (address.shipping.street) filter["address.shipping.street"] = address.shipping.street;
-    if (address.shipping.city) filter["address.shipping.city"] = address.shipping.city;
-     
-    if (address.shipping.pincod)filter["address.shipping.pincode"]= address.shipping.pincode;
-      if (address.billing.street) filter["address.billing.street"] = address.billing.street;
-     if (address.billing.city) filter["address.billing.city"] = address.billing.city;
-     if (address.billing.pincode)
-      filter["address.billing.pincode"] = address.billing.pincode;
-
+ if(address.shipping){ if (address.shipping.street) filter["address.shipping.street"] = address.shipping.street;
+ if (address.shipping.city) filter["address.shipping.city"] = address.shipping.city;
+  
+ if (address.shipping.pincod)filter["address.shipping.pincode"]= address.shipping.pincode;
+}if(address.billing){ if (address.billing.street) filter["address.billing.street"] = address.billing.street;
+if (address.billing.city) filter["address.billing.city"] = address.billing.city;
+if (address.billing.pincode)
+ filter["address.billing.pincode"] = address.billing.pincode;
+}
+   
 
  }
     const updatedUser = await userModel.findByIdAndUpdate(
