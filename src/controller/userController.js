@@ -36,6 +36,12 @@ const createUser = async function (req, res) {
       return res
         .status(400)
         .send({ status: false, message: "User email-id is required" });
+        
+        if (validation.isValid(data.email))
+      return res.status(400).send({
+        status: false,
+        message: "First name must be contains only charachters",
+      });
 
     if (!validation.isValidEmail(data.email)) {
       return res
@@ -58,6 +64,12 @@ const createUser = async function (req, res) {
         .status(400)
         .send({ status: false, message: "User phone number is required" });
 
+        if (!validation.isValid(data.phone)) {                                  
+          return res
+            .status(400)
+            .send({ status: false, message: "Valid phone number is required" });
+        }
+
     if (!validation.isValidPhone(data.phone)) {                                  
       return res
         .status(400)
@@ -74,6 +86,19 @@ const createUser = async function (req, res) {
       return res
         .status(400)
         .send({ status: false, message: "Password is required" });
+
+        if (!validation.isValidPhone(data.password)) {                                  
+          return res
+            .status(400)
+            .send({ status: false, message: "Valid Password is requireed" });
+        }
+
+        if (!validation.isValidPassword(data.password)) {                                  
+          return res
+            .status(400)
+            .send({ status: false, message: "Correct format of password is required" });
+        }
+
 
     if (!data.address)
       return res
@@ -166,7 +191,7 @@ const createUser = async function (req, res) {
       lname: lname,
       email: email,
       profileImage: uploadedProfilePictureUrl,
-      phone: phone,
+      phone: parseInt(phone),
       password: encryptedPassword,
       address: address,
     };
@@ -205,8 +230,10 @@ const login = async function (req, res) {
     if (!email) {
       return res.status(400).send({ status: false, message: "EmailId is required" });
     }
+    if (!validation.isValid(email)) return res.status(400).send({ status: false, message: 'email is mandatory' })
+
     
-    if (!validation.isValidEmail) {
+    if (!validation.isValidEmail(email)) {
       return res
         .status(400)
         .status({ status: false, message: "Please enter email in valid format" });
@@ -220,7 +247,7 @@ const login = async function (req, res) {
     if (!validation.isValid(password)) return res.status(400).send({ status: false, message: 'email is mandatory' })
 
 
-    if (!validation.isValidPassword) {
+    if (!validation.isValidPassword(password)) {
       return res
         .status(400)
         .status({ status: false, message: "Please inter password in valid format" });
@@ -284,17 +311,15 @@ const updateUser = async function (req, res) {
     
     if(req.files){
       let profileImage = req.files
-      console.log(req.files)
+     
     if (profileImage!=undefined && profileImage.length > 0) {
       //upload to s3 and get the uploaded link
       // res.send the link back to frontend/postman
-      //let uploadedFileURL= await uploadFile( files[0] )
+     
       var updatedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
-      //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
+     
       } 
-      //else {
-    //  return res.status(400).send({ msg: "No file found" });
-    // }
+      
     filter.profileImage = updatedProfilePictureUrl;
     }
     if (fname) filter.fname = fname;
