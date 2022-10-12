@@ -173,6 +173,11 @@ const createUser = async function (req, res) {
     }
 
 
+    if(!profileImage)
+    return res
+    .status(400)
+    .send({ status: false, message: "ProfileImage is Mandatory" });
+
     if (profileImage && profileImage.length > 0) {
       //upload to s3 and get the uploaded link
       // res.send the link back to frontend/postman
