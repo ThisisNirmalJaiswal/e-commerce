@@ -60,50 +60,46 @@ const getProduct = async function (req, res) {
   try {
     let filter = req.query;
     let query = { isDeleted: false };
-   
-      const { name, description, isFreeShipping, style, size, installments, priceGreaterThan, priceLessThan } =
-        filter;
 
-      let nameIncludes = new RegExp(`${filter.name}`);
-      
-      
+    const { name, description, isFreeShipping, style, size, installments, priceGreaterThan, priceLessThan } =
+      filter;
 
-      if (name) {
-        query.title = nameIncludes;
-      }
-      if (description) {
-        query.description = description.trim();
-      }
-      if (isFreeShipping) {
-        query.isFreeShipping = isFreeShipping;
-      }
-      if (style) {
-        query.style = style.trim();
-      }
-      if (installments) {
-        query.installments = installments;
-      }
-      if (size) {
-       
-        const sizeArr = size
-          .split(",")
-          .map((x) => x.trim());
-          console.log(sizeArr)
-        query.availableSizes = { $all: sizeArr };
-      }
-    
-
-  if(filter.priceGreaterThan){
-
-   query.price ={ $gt:Number(priceGreaterThan)}
-   
-  }else if(filter.priceLessThan){
-    query.price =  {$lt:Number(priceLessThan)}
-  }else if(filter.priceGreaterThan && filter.priceLessThan){
-   query.price = {$and: [{price:{$gt:Number(priceGreaterThan)}}, {price:{$lt:Number(priceLessThan)}}]}
-  }
+    let nameIncludes = new RegExp(`${filter.name}`);
 
 
+
+    if (name) {
+      query.title = nameIncludes;
+    }
+    if (description) {
+      query.description = description.trim();
+    }
+    if (isFreeShipping) {
+      query.isFreeShipping = isFreeShipping;
+    }
+    if (style) {
+      query.style = style.trim();
+    }
+    if (installments) {
+      query.installments = installments;
+    }
+    if (size) {
+
+      const sizeArr = size
+        .split(",")
+        .map((x) => x.trim());
+
+      query.availableSizes = { $all: sizeArr };
+    }
+
+    if (filter.priceGreaterThan && filter.priceLessThan) {
+      query.price = { $gt: Number(priceGreaterThan), $lt: Number(priceLessThan) }
+    }
+    else if (filter.priceGreaterThan) {
+      query.price = { $gt: Number(priceGreaterThan) }
+    } else if (filter.priceLessThan) {
+      query.price = { $lt: Number(priceLessThan) }
+    }
     let data = await productModel
       .find({ ...query })
       .sort({ price: filter.priceSort });
@@ -161,38 +157,38 @@ const getProductById = async function (req, res) {
 
 //--------------------------------DeleteAPI-------------------------
 
-const deleteProductById = async function(req, res){
-  try{
-   let productId = req.params.productId
+const deleteProductById = async function (req, res) {
+  try {
+    let productId = req.params.productId
 
- // productId validation
- if (!validation.isValidId(productId))
-   return res.status(400).send({ status: false, message: "Invalid productId" });
+    // productId validation
+    if (!validation.isValidId(productId))
+      return res.status(400).send({ status: false, message: "Invalid productId" });
 
 
-let savedData = await productModel.findById(productId);
+    let savedData = await productModel.findById(productId);
 
-//if it is already deleted
-if (savedData.isDeleted)
-  return res.status(404).send({
-    status: false,
-    message: "Product not found",
-  });
+    //if it is already deleted
+    if (savedData.isDeleted)
+      return res.status(404).send({
+        status: false,
+        message: "Product not found",
+      });
 
-// updating book.
-let deleteProduct = await productModel.findByIdAndUpdate(
-  savedData,
-  { $set: { isDeleted: true, deletedAt: new Date() } },
-  { new: true }
-);
+    // updating book.
+    let deleteProduct = await productModel.findByIdAndUpdate(
+      savedData,
+      { $set: { isDeleted: true, deletedAt: new Date() } },
+      { new: true }
+    );
 
-return res
-  .status(200)
-  .send({ status: true, message: "Product deleted successfully", data: deleteProduct });
+    return res
+      .status(200)
+      .send({ status: true, message: "Product deleted successfully", data: deleteProduct });
 
-}catch(err){
-  return res.status(500).send({status: false, msg: err.message})
+  } catch (err) {
+    return res.status(500).send({ status: false, msg: err.message })
+  }
 }
-}
 
-module.exports = { createProduct, getProduct, getProductById,deleteProductById };
+module.exports = { createProduct, getProduct, getProductById, deleteProductById };
