@@ -162,7 +162,7 @@ const deleteProductById = async function (req, res) {
     let productId = req.params.productId
 
     // productId validation
-    if (!validation.isValidId(productId))
+    if (!validation.isValidObjectId(productId))
       return res.status(400).send({ status: false, message: "Invalid productId" });
 
 
@@ -190,5 +190,7 @@ const deleteProductById = async function (req, res) {
     return res.status(500).send({ status: false, msg: err.message })
   }
 }
+
+//_________________________________Updateproduct______________________________________________________________
 
 module.exports = { createProduct, getProduct, getProductById, deleteProductById };
