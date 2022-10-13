@@ -20,6 +20,11 @@ mongoose
 
 app.use("/", route);
 
+app.use((req, res, next) => {
+  res.status(400).send({ status: false, error: "Enter proper Url" });
+});
+
+
 app.listen(3000, function () {
   console.log("Express app running on port 3000")
 });

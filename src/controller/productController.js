@@ -2,6 +2,9 @@ const productModel = require("../models/productModel");
 const AWS = require("../awsfile/aws");
 const validation = require("../Util/Validations");
 
+
+//---------------------------create Products-----------------------------------
+
 const createProduct = async function (req, res) {
   try {
     let data = req.body;
@@ -75,6 +78,8 @@ const createProduct = async function (req, res) {
 //     }
 // }
 
+//-------------------------getProduct---------------------
+
 const getProduct = async function (req, res) {
   try {
     let filter = req.query;
@@ -146,6 +151,7 @@ const getProduct = async function (req, res) {
     return res.status(500).send({ status: false, error: err.message });
   }
 };
+//--------------------------------getProductById-------------------------
 
 const getProductById = async function (req, res) {
   try {
@@ -178,4 +184,40 @@ const getProductById = async function (req, res) {
   }
 };
 
-module.exports = { createProduct, getProduct, getProductById };
+//--------------------------------DeleteAPI-------------------------
+
+const deleteProductById = async function(req, res){
+  try{
+   let productId = req.params.productId
+
+ // productId validation
+ if (!validation.isValidId(productId))
+   return res.status(400).send({ status: false, message: "Invalid productId" });
+
+
+let savedData = await productModel.findById(productId);
+
+//if it is already deleted
+if (savedData.isDeleted)
+  return res.status(404).send({
+    status: false,
+    message: "Product not found",
+  });
+
+// updating book.
+let deleteProduct = await productModel.findByIdAndUpdate(
+  savedData,
+  { $set: { isDeleted: true, deletedAt: new Date() } },
+  { new: true }
+);
+
+return res
+  .status(200)
+  .send({ status: true, message: "Product deleted successfully", data: deleteProduct });
+
+}catch(err){
+  return res.status(500).send({status: false, msg: err.message})
+}
+}
+
+module.exports = { createProduct, getProduct, getProductById,deleteProductById };
