@@ -31,17 +31,38 @@ const createProduct = async function (req, res) {
     } else {
       res.status(400).send({ msg: "No file found" });
     }
+    
+    
+  const sizeArr = data.availableSizes
+        .split(",")
+        .map((x) => x.trim());
+        let p=false
+        console.log( typeof p)
+        console.log(p)
+      data.availableSizes = sizeArr;
+      console.log( typeof sizeArr)
+      
+      if(data.isFreeShipping=="false"){
+        data.isFreeShipping = (!Boolean(isFreeShipping.trim()))
+  
+       }
+        if(data.isFreeShipping=="true");{
+          data.isFreeShipping = (Boolean(isFreeShipping.trim()))
+        }
+
+
+
     const productData = {
-      title: title,
-      description: description,
-      price: price,
-      currencyId: currencyId,
-      currencyFormat: currencyFormat,
+      title: title.trim(),
+      description: description.trim(),
+      price: price.trim(),
+      currencyId: currencyId.trim(),
+      currencyFormat: currencyFormat.trim(),
       isFreeShipping: isFreeShipping,
       productImage: uploadedProfilePictureUrl, // s3 link
-      style: style,
-      availableSizes: availableSizes,
-      installments: installments,
+      style: style.trim(),
+      availableSizes: sizeArr,
+      installments: installments.trim(),
     };
     let product = await productModel.create(productData);
     return res.status(201).send({
@@ -207,6 +228,20 @@ const updateProduct = async function (req, res) {
 try {
   let requestBody = req.body;
 
+  productIdFromParam = req.params.productId
+
+  if (!(validation.isValidObjectId(productIdFromParam))) {
+    return res
+      .status(400)
+      .send({ status: false, message: " Please!! input a valid Id :(" });
+  }
+
+  let productById = await productModel.findById(productIdFromParam)
+
+    if (!productById) {
+      return res.status(404).send({ status: false, message: " User not found!!!" })
+    }
+
   let filter = {isDeleted:false};
 
   let { title,
@@ -239,7 +274,7 @@ try {
           message: "title can't be empty",
         });
 
-      if (!validation.isValidString(title.trim()))
+      if (!validation.isValidCompString(title.trim()))
         return res.status(400).send({
           status: false,
           message: "title must be a string",
@@ -256,7 +291,7 @@ try {
           message: "description can't be empty",
         });
 
-      if (!validation.isValidString(description.trim()))
+      if (!validation.isValidCompString(description.trim()))
         return res.status(400).send({
           status: false,
           message: "description must be a string",
@@ -286,11 +321,7 @@ try {
         message: "currencyId can't be empty",
       });
 
-      if (!validation.isValidString(currencyId.trim()))
-      return res.status(400).send({
-        status: false,
-        message: "currencyId must be a string",
-      });
+      
 
       filter.currencyId = currencyId
     }
@@ -303,18 +334,20 @@ try {
         message: "currencyFormat can't be empty",
       });
 
-      if (!validation.isValidString(currencyFormat.trim()))
-      return res.status(400).send({
-        status: false,
-        message: "currencyFormat must be a string",
-      });
+      // if (validation.isValidString(currencyFormat.trim()))
+      // return res.status(400).send({
+      //   status: false,
+      //   message: "currencyFormat must be a string",
+      // });
 
       filter.currencyFormat = currencyFormat
     }
 
      if(isFreeShipping){
 
-      if((isFreeShipping!="false") || (isFreeShipping!="false"))
+      console.log(typeof isFreeShipping)
+
+      if((isFreeShipping!="false") && (isFreeShipping!="true"))
       return res.status(400).send({
         status: false,
         message: "isFreeShipping must be either true or false",
@@ -352,7 +385,7 @@ try {
           .split(",")
           .map((x) => x.trim());
 
-        query.availableSizes = sizeArr ;
+        filter.availableSizes = sizeArr ;
        }
 
        if (installments) {
@@ -368,7 +401,9 @@ try {
         filter.installments = Number(installments)
       }
 
-      const updatedProduct = await productModel.findByOneAndUpdate({_id:req.userIdFromParam}, filter, {new:true})
+    
+
+      const updatedProduct = await productModel.findByIdAndUpdate({_id:productIdFromParam}, filter, {new:true})
       return res.status(200).send({ status: true, message: 'Success', data: updatedProduct })
     }
     catch (err) {

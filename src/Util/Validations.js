@@ -38,16 +38,21 @@ const isValidPassword = (password) => {
  
 };
 
-const isValidObjectId = (objectId) => {
-  return mongoose.Types.ObjectId.isValid(objectId);
+const isValidObjectId = function (objectId) {
+  return mongoose.Types.ObjectId.isValid(objectId) //24
 }
 
 const isValidPrice = (price) => {
-  return (/^(0(?!\.00)|[1-9]\d{0,6})\.\d{2}$/.test(price))
+  return (/^\d+(,\d{3})*(\.\d{1,2})?$/.test(price))
 };
 
 const isValidinstallments= (installments)=>{
   return(/[0-9]/.test(installments))
+}
+
+const isValidCompString = function (value) {
+  let regex = /^[a-zA-Z]+([\s][a-zA-Z]+)*$/
+  return regex.test(value)//Prince Soni
 }
 
 
@@ -60,5 +65,6 @@ module.exports = { isValid,
   isValidObjectId, 
   isValidPincode,
   isValidPrice,
-  isValidinstallments
+  isValidinstallments,
+  isValidCompString
  }

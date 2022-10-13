@@ -18,6 +18,8 @@ router.put("/user/:userId/profile", auth.verifyToken, auth.authentication,auth.a
 router.post("/products",productController.createProduct);
 router.get("/products",productController.getProduct);
 router.get("/products/:productId",productController.getProductById);
+router.put("/products/:productId", productController.updateProduct)
+
 router.delete("/products/:productId", productController.deleteProductById)
 
 
