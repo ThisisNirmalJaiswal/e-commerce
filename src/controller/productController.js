@@ -54,30 +54,6 @@ const createProduct = async function (req, res) {
   }
 };
 
-// const getProduct = async function(req, res){
-//     try {
-//         let filters = req.query
-//         let userId = filters.userId
-//         // ======================================= User Id validation ======================================
-//         if (userId) {
-//             if (!isValidObjectId(userId)) return res.status(400).send({ status: false, msg: "please enter valid user id " })
-//         }
-
-//         let getProducts = await productModel.find({ isDeleted: false, ...filters }).select({ _id: 1, title: 1, excerpt: 1, userId: 1, category: 1, releasedAt: 1, reviews: 1 })
-
-//         if (getProducts.length == 0) return res.status(404).send({ status: false, message: "product not found" })
-
-//         // =========================================== Sorting title in A-Z order ========================================
-
-//         let sortProducts = getProducts.sort((a, b) => a.title.localeCompare(b.title))
-
-//         return res.status(200).send({ status: true, message: "Book list", data: sortProducts })
-
-//     } catch (err) {
-//         res.status(500).send({ status: false, message: err.message })
-//     }
-// }
-
 //-------------------------getProduct---------------------
 
 const getProduct = async function (req, res) {
