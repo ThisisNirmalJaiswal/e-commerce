@@ -64,7 +64,7 @@ const getProduct = async function (req, res) {
     const { name, description, isFreeShipping, style, size, installments, priceGreaterThan, priceLessThan } =
       filter;
 
-    let nameIncludes = new RegExp(`${filter.name}`);
+    let nameIncludes = RegExp(`${filter.name}`);
 
 
 
