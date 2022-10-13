@@ -61,7 +61,7 @@ const getProduct = async function (req, res) {
     let filter = req.query;
     let query = { isDeleted: false };
 
-    const { name, description, isFreeShipping, style, size, installments, priceGreaterThan, priceLessThan } =
+    const { name, description, isFreeShipping, style, availableSizes, installments, priceGreaterThan, priceLessThan } =
       filter;
 
     let nameIncludes = RegExp(`${filter.name}`);
@@ -75,6 +75,12 @@ const getProduct = async function (req, res) {
       query.description = description.trim();
     }
     if (isFreeShipping) {
+      if(isFreeShipping=="false");
+
+
+      query.isFreeShipping = (!Boolean(isFreeShipping))
+
+      
       query.isFreeShipping = isFreeShipping;
     }
     if (style) {
@@ -83,9 +89,11 @@ const getProduct = async function (req, res) {
     if (installments) {
       query.installments = installments;
     }
-    if (size) {
+    if (availableSizes) {
 
-      const sizeArr = size
+      
+
+      const sizeArr = availableSizes
         .split(",")
         .map((x) => x.trim());
 
@@ -96,6 +104,7 @@ const getProduct = async function (req, res) {
       query.price = { $gt: Number(priceGreaterThan), $lt: Number(priceLessThan) }
     }
     else if (filter.priceGreaterThan) {
+      
       query.price = { $gt: Number(priceGreaterThan) }
     } else if (filter.priceLessThan) {
       query.price = { $lt: Number(priceLessThan) }
@@ -193,4 +202,177 @@ const deleteProductById = async function (req, res) {
 
 //_________________________________Updateproduct______________________________________________________________
 
-module.exports = { createProduct, getProduct, getProductById, deleteProductById };
+
+const updateProduct = async function (req, res) {
+try {
+  let requestBody = req.body;
+
+  let filter = {isDeleted:false};
+
+  let { title,
+    description, 
+    price, 
+    currencyId, 
+    currencyFormat, 
+    isFreeShipping, 
+     style, 
+    availableSizes, 
+    installments  } = requestBody;
+
+    if (req.files) {
+      let productImage = req.files
+
+      if (productImage != undefined && productImage.length > 0) {
+
+        var updatedProductPictureUrl = await AWS.uploadFile(productImage[0]);
+
+      }
+
+      filter.productImage = updatedProductPictureUrl;
+    }
+
+    if (title) {
+
+      if (validation.isValid(title))
+        return res.status(400).send({
+          status: false,
+          message: "title can't be empty",
+        });
+
+      if (!validation.isValidString(title.trim()))
+        return res.status(400).send({
+          status: false,
+          message: "title must be a string",
+        });
+
+      filter.title = title
+    }
+
+    if (description) {
+
+      if (validation.isValid(description))
+        return res.status(400).send({
+          status: false,
+          message: "description can't be empty",
+        });
+
+      if (!validation.isValidString(description.trim()))
+        return res.status(400).send({
+          status: false,
+          message: "description must be a string",
+        });
+
+      filter.description = description
+    }
+
+    if (price) {
+
+      if (!validation.isValidPrice(price))
+        return res.status(400).send({
+          status: false,
+          message: "Price is invalid",
+        });
+
+      
+
+      filter.price = price
+    }
+
+    if (currencyId) {
+
+      if (validation.isValid(currencyId))
+      return res.status(400).send({
+        status: false,
+        message: "currencyId can't be empty",
+      });
+
+      if (!validation.isValidString(currencyId.trim()))
+      return res.status(400).send({
+        status: false,
+        message: "currencyId must be a string",
+      });
+
+      filter.currencyId = currencyId
+    }
+
+    if (currencyFormat) {
+
+      if (validation.isValid(currencyFormat))
+      return res.status(400).send({
+        status: false,
+        message: "currencyFormat can't be empty",
+      });
+
+      if (!validation.isValidString(currencyFormat.trim()))
+      return res.status(400).send({
+        status: false,
+        message: "currencyFormat must be a string",
+      });
+
+      filter.currencyFormat = currencyFormat
+    }
+
+     if(isFreeShipping){
+
+      if((isFreeShipping!="false") || (isFreeShipping!="false"))
+      return res.status(400).send({
+        status: false,
+        message: "isFreeShipping must be either true or false",
+      });
+
+       
+     if(isFreeShipping=="false"){
+      filter.isFreeShipping = (!Boolean(isFreeShipping))
+
+     }
+      if(isFreeShipping=="true");{
+        filter.isFreeShipping = (Boolean(isFreeShipping))
+      }
+     }
+
+     if (style) {
+
+      if (validation.isValid(style))
+        return res.status(400).send({
+          status: false,
+          message: "style can't be empty",
+        });
+
+      if (!validation.isValidString(style.trim()))
+        return res.status(400).send({
+          status: false,
+          message: "style must be a string",
+        });
+
+      filter.style = style
+    }
+
+    if(availableSizes){
+           const sizeArr = availableSizes
+          .split(",")
+          .map((x) => x.trim());
+
+        query.availableSizes = sizeArr ;
+       }
+
+       if (installments) {
+
+        if (!validation.isValidinstallments(installments))
+          return res.status(400).send({
+            status: false,
+            message: "installments is invalid",
+          });
+  
+        
+  
+        filter.installments = Number(installments)
+      }
+
+      const updatedProduct = await productModel.findByOneAndUpdate({_id:req.userIdFromParam}, filter, {new:true})
+      return res.status(200).send({ status: true, message: 'Success', data: updatedProduct })
+    }
+    catch (err) {
+        return res.status(500).send({ err: err.message })
+    }
+}
+module.exports = { createProduct, getProduct, getProductById, deleteProductById, updateProduct };

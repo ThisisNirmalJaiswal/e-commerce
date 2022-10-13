@@ -42,5 +42,23 @@ const isValidObjectId = (objectId) => {
   return mongoose.Types.ObjectId.isValid(objectId);
 }
 
+const isValidPrice = (price) => {
+  return (/^(0(?!\.00)|[1-9]\d{0,6})\.\d{2}$/.test(price))
+};
 
-module.exports = { isValid, isValidBody, isValidString, isValidPhone, isValidEmail, isValidPassword , isValidObjectId, isValidPincode, }
+const isValidinstallments= (installments)=>{
+  return(/[0-9]/.test(installments))
+}
+
+
+module.exports = { isValid, 
+  isValidBody, 
+  isValidString, 
+  isValidPhone, 
+  isValidEmail, 
+  isValidPassword, 
+  isValidObjectId, 
+  isValidPincode,
+  isValidPrice,
+  isValidinstallments
+ }
