@@ -36,11 +36,8 @@ const createProduct = async function (req, res) {
   const sizeArr = data.availableSizes
         .split(",")
         .map((x) => x.trim());
-        let p=false
-        console.log( typeof p)
-        console.log(p)
+        
       data.availableSizes = sizeArr;
-      console.log( typeof sizeArr)
       
       if(data.isFreeShipping=="false"){
         data.isFreeShipping = (!Boolean(isFreeShipping.trim()))
