@@ -60,15 +60,13 @@ const getProduct = async function (req, res) {
   try {
     let filter = req.query;
     let query = { isDeleted: false };
-    if (filter) {
-      const { name, description, isFreeShipping, style, size, installments,price } =
+   
+      const { name, description, isFreeShipping, style, size, installments, priceGreaterThan, priceLessThan } =
         filter;
 
       let nameIncludes = new RegExp(`${filter.name}`);
       
-      if(price){
-        query.price = price
-      }
+      
 
       if (name) {
         query.title = nameIncludes;
@@ -86,22 +84,23 @@ const getProduct = async function (req, res) {
         query.installments = installments;
       }
       if (size) {
+       
         const sizeArr = size
-          .trim()
           .split(",")
           .map((x) => x.trim());
+          console.log(sizeArr)
         query.availableSizes = { $all: sizeArr };
       }
-    }
+    
 
-  if(filter.price){
+  if(filter.priceGreaterThan){
 
    query.price ={ $gt:Number(priceGreaterThan)}
    
-  }else if(filter.price){
-    query.price =  {$gt:Number(priceLessThan)}
+  }else if(filter.priceLessThan){
+    query.price =  {$lt:Number(priceLessThan)}
   }else if(filter.priceGreaterThan && filter.priceLessThan){
-   query.price = { $gt:Number(priceGreaterThan), $gt:Number(priceLessThan)}
+   query.price = {$and: [{price:{$gt:Number(priceGreaterThan)}}, {price:{$lt:Number(priceLessThan)}}]}
   }
 
 
