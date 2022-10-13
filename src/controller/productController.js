@@ -80,10 +80,14 @@ const getProduct = async function (req, res) {
     let filter = req.query;
     let query = { isDeleted: false };
     if (filter) {
-      const { name, description, isFreeShipping, style, size, installments } =
+      const { name, description, isFreeShipping, style, size, installments,price } =
         filter;
 
       let nameIncludes = new RegExp(`${filter.name}`);
+      
+      if(price){
+        query.price = price
+      }
 
       if (name) {
         query.title = nameIncludes;
@@ -108,6 +112,17 @@ const getProduct = async function (req, res) {
         query.availableSizes = { $all: sizeArr };
       }
     }
+
+  if(filter.price){
+
+   query.price ={ $gt:Number(priceGreaterThan)}
+   
+  }else if(filter.price){
+    query.price =  {$gt:Number(priceLessThan)}
+  }else if(filter.priceGreaterThan && filter.priceLessThan){
+   query.price = { $gt:Number(priceGreaterThan), $gt:Number(priceLessThan)}
+  }
+
 
     let data = await productModel
       .find({ ...query })
