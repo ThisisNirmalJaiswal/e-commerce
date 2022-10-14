@@ -22,23 +22,69 @@ const createProduct = async function (req, res) {
       installments,
     } = data;
 
-    if (productImage && productImage.length > 0) {
-      //upload to s3 and get the uploaded link
-      // res.send the link back to frontend/postman
-      //let uploadedFileURL= await uploadFile( files[0] )
-      var uploadedProfilePictureUrl = await AWS.uploadFile(productImage[0]);
-      //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
-    } else {
-      res.status(400).send({ msg: "No file found" });
-    }
-    
-    
-  const sizeArr = data.availableSizes
-        .split(",")
-        .map((x) => x.trim());
-        
-      data.availableSizes = sizeArr;
-      
+    if ((validation.isValidBody(data))&&(req.files==undefined))
+    return res.status(400).send({
+      status: false,
+      message: "Please!! provide required details to create product",
+    });
+
+    if (validation.isValid(title.trim()))
+    return res.status(400).send({
+      status: false,
+      message: "title can't be empty",
+    });
+
+  if (!validation.isValidCompString(title.trim()))
+    return res.status(400).send({
+      status: false,
+      message: "title must be a string",
+    });
+
+    if (validation.isValid(description.trim()))
+        return res.status(400).send({
+          status: false,
+          message: "description can't be empty",
+        });
+
+      if (!validation.isValidCompString(description.trim()))
+        return res.status(400).send({
+          status: false,
+          message: "description must be a string",
+        });
+
+   
+    if (!validation.isValidPrice(price))
+    return res.status(400).send({
+      status: false,
+      message: "Price is invalid",
+    });
+
+      if ((currencyId!=undefined)&&("₹").match(currencyId))
+      return res.status(400).send({
+        status: false,
+        message: "currencyId is invalid",
+      });
+
+      if ((currencyFormat!=undefined)&&("INR").match(currencyFormat))
+      return res.status(400).send({
+        status: false,
+        message: "currencyId is invalid",
+      });
+
+      if (validation.isValid(isFreeShipping))
+      return res.status(400).send({
+        status: false,
+        message: "isFreeShipping can't be empty",
+      });
+
+
+      if((isFreeShipping!="false") && (isFreeShipping!="true"))
+      return res.status(400).send({
+        status: false,
+        message: "isFreeShipping must be either true or false",
+      });
+
+
       if(data.isFreeShipping=="false"){
         data.isFreeShipping = (!Boolean(isFreeShipping.trim()))
   
@@ -47,19 +93,67 @@ const createProduct = async function (req, res) {
           data.isFreeShipping = (Boolean(isFreeShipping.trim()))
         }
 
+        if (validation.isValid(style))
+    return res.status(400).send({
+      status: false,
+      message: "style can't be empty",
+    });
 
+    if (!validation.isValidCompString(style.trim()))
+    return res.status(400).send({
+      status: false,
+      message: "style must be a string",
+    });
+
+    if (validation.isValid(installments))
+    return res.status(400).send({
+      status: false,
+      message: "installments can't be empty",
+    });
+
+
+    if (!validation.isValidinstallments(installments))
+          return res.status(400).send({
+            status: false,
+            message: "installments is invalid",
+          });
+
+        const sizeArr = availableSizes
+        .split(",")
+        .map((x) => x.trim());
+        
+      data.availableSizes = sizeArr;
+
+      if (Array.isArray(sizeArr)) {
+        for (let i = 0; i < sizeArr.length; i++) {
+            if (["S", "XS", "M", "X", "L", "XXL", "XL"].indexOf(sizeArr[i])==-1)
+                return res.status(400).send({ status: false, message: "Please Enter valid sizes, it should include only sizes from  (S,XS,M,X,L,XXL,XL) " })
+        }
+    }
+
+
+    if (productImage && productImage.length > 0) {
+      //upload to s3 and get the uploaded link
+      // res.send the link back to frontend/postman
+      //let uploadedFileURL= await uploadFile( files[0] )
+      var uploadedProfilePictureUrl = await AWS.uploadFile(productImage[0]);
+      //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
+    } else {
+      return res.status(400).send({ msg: "No file found" });
+    }
+  
 
     const productData = {
-      title: title.trim(),
+      title: title,
       description: description.trim(),
-      price: price.trim(),
-      currencyId: currencyId.trim(),
-      currencyFormat: currencyFormat.trim(),
+      price: price,
+      currencyId: currencyId,
+      currencyFormat: currencyFormat,
       isFreeShipping: isFreeShipping,
       productImage: uploadedProfilePictureUrl, // s3 link
-      style: style.trim(),
+      style: style,
       availableSizes: sizeArr,
-      installments: installments.trim(),
+      installments: installments,
     };
     let product = await productModel.create(productData);
     return res.status(201).send({
@@ -251,6 +345,12 @@ try {
     availableSizes, 
     installments  } = requestBody;
 
+    if ((validation.isValidBody(requestBody))&&(req.files==undefined))
+    return res.status(400).send({
+      status: false,
+      message: "Please!! provide required details to update your account",
+    });
+
     if (req.files) {
       let productImage = req.files
 
@@ -264,8 +364,9 @@ try {
     }
 
     if (title) {
+      console.log(title)
 
-      if (validation.isValid(title))
+      if (validation.isValid(title.trim()))
         return res.status(400).send({
           status: false,
           message: "title can't be empty",
@@ -382,7 +483,15 @@ try {
           .split(",")
           .map((x) => x.trim());
 
-        filter.availableSizes = sizeArr ;
+          if (Array.isArray(sizeArr)) {
+            for (let i = 0; i < sizeArr.length; i++) {
+                if (["S", "XS", "M", "X", "L", "XXL", "XL"].indexOf(sizeArr[i])==-1)
+                    return res.status(400).send({ status: false, message: "Please Enter valid sizes, it should include only sizes from  (S,XS,M,X,L,XXL,XL) " })
+            }
+        }
+    
+        filter.availableSizes = availableSizes.concat(sizeArr.filter((item) => availableSizes.indexOf(item) < 0))
+        
        }
 
        if (installments) {

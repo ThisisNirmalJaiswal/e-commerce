@@ -52,7 +52,7 @@ const isValidinstallments= (installments)=>{
 
 const isValidCompString = function (value) {
   let regex = /^[a-zA-Z]+([\s][a-zA-Z]+)*$/
-  return regex.test(value)//Prince Soni
+  return regex.test(value)
 }
 
 
