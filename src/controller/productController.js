@@ -40,6 +40,13 @@ const createProduct = async function (req, res) {
       message: "title must be a string",
     });
 
+    const titleExist = await productModel.findOne({title:title})
+    if(titleExist)
+    return res.status(400).send({
+      status: false,
+      message: "title already exist",
+    });
+
     if (validation.isValid(description.trim()))
         return res.status(400).send({
           status: false,
@@ -78,6 +85,7 @@ const createProduct = async function (req, res) {
       });
 
 
+      
       if((isFreeShipping!="false") && (isFreeShipping!="true"))
       return res.status(400).send({
         status: false,
@@ -85,12 +93,12 @@ const createProduct = async function (req, res) {
       });
 
 
-      if(data.isFreeShipping=="false"){
-        data.isFreeShipping = (!Boolean(isFreeShipping.trim()))
-  
+      if(isFreeShipping=="false"){
+        isFreeShipping = (!Boolean(isFreeShipping))
+        
        }
-        if(data.isFreeShipping=="true");{
-          data.isFreeShipping = (Boolean(isFreeShipping.trim()))
+        if(isFreeShipping=="true");{
+          isFreeShipping = (Boolean(isFreeShipping))
         }
 
         if (validation.isValid(style))
@@ -131,11 +139,18 @@ const createProduct = async function (req, res) {
         }
     }
 
+    if (!validation.validImageType(productImage[0].mimetype)) {
+      return res
+          .status(400)
+          .send({
+              status: false,
+              message: "Uploaded file should be in (jpeg/jpg/png) this format",
+          });}
+
 
     if (productImage && productImage.length > 0) {
-      //upload to s3 and get the uploaded link
-      // res.send the link back to frontend/postman
-      //let uploadedFileURL= await uploadFile( files[0] )
+      
+      console.log(productImage)
       var uploadedProfilePictureUrl = await AWS.uploadFile(productImage[0]);
       //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
     } else {
@@ -330,7 +345,7 @@ try {
   let productById = await productModel.findById(productIdFromParam)
 
     if (!productById) {
-      return res.status(404).send({ status: false, message: " User not found!!!" })
+      return res.status(404).send({ status: false, message: " Product not found!!!" })
     }
 
   let filter = {isDeleted:false};
@@ -351,8 +366,19 @@ try {
       message: "Please!! provide required details to update your account",
     });
 
+  
     if (req.files) {
       let productImage = req.files
+
+      if (!validation.validImageType(productImage[0].mimetype)) {
+        return res
+            .status(400)
+            .send({
+                status: false,
+                message: "Uploaded file should be in (jpeg/jpg/png) this format",
+            });
+    }
+  
 
       if (productImage != undefined && productImage.length > 0) {
 
@@ -364,7 +390,7 @@ try {
     }
 
     if (title) {
-      console.log(title)
+      
 
       if (validation.isValid(title.trim()))
         return res.status(400).send({
@@ -377,6 +403,14 @@ try {
           status: false,
           message: "title must be a string",
         });
+
+        const titleExist = await productModel.findOne({title:title})
+        if(titleExist)
+        return res.status(400).send({
+          status: false,
+          message: "title already exist",
+        });
+    
 
       filter.title = title
     }

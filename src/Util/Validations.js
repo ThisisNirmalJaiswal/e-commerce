@@ -55,6 +55,10 @@ const isValidCompString = function (value) {
   return regex.test(value)
 }
 
+const validImageType = function(value) {
+  const regexForMimeTypes = /image\/png|image\/jpeg|image\/jpg/;
+  return regexForMimeTypes.test(value)
+}
 
 module.exports = { isValid, 
   isValidBody, 
@@ -66,5 +70,6 @@ module.exports = { isValid,
   isValidPincode,
   isValidPrice,
   isValidinstallments,
-  isValidCompString
+  isValidCompString,
+  validImageType
  }

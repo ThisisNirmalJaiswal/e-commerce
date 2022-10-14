@@ -7,7 +7,7 @@ const productSchema = new mongoose.Schema(
     price: { type: Number, required: true },
     currencyId: { type: String, required: true, default: "INR" },
     currencyFormat: { type: String, required: true, default: "₹" },
-    isFreeShipping: { type: Boolean, default: false },
+    isFreeShipping: { type: Boolean, trim:true, default: false },
     productImage: { type: String, required: true }, // s3 link
     style: { type: String },
     availableSizes: [
