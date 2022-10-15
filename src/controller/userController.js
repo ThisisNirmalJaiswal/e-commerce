@@ -116,17 +116,29 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "Please enter password in valid format" });
     }
 
+    if (validation.isValid(address))
+    return res.status(400).send({
+      status: false,
+      message: "address can't be empty",
+    });
 
+    
+    // const {address.shipping, address.billing} = address
 
     address = JSON.parse(address);
 
-    
-
-
-    if (!data.address)
+    if (!address)
       return res
         .status(400)
         .send({ status: false, message: "Address is required" });
+
+        // const {shipping , billing} = address
+        
+    if (validation.isValid(address.shipping))
+    return res.status(400).send({
+      status: false,
+      message: "shipping address can't be empty",
+    });
 
 
     //  checking if city is valid or not.
@@ -180,6 +192,11 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "Invalid pincode..." });
     }
 
+    if (validation.isValid(data.address.billibg))
+    return res.status(400).send({
+      status: false,
+      message: "billing address can't be empty",
+    });
 
 
     if (!address.billing.street) {
