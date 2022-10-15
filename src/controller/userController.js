@@ -78,6 +78,27 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "User phone number is not valid" });
     }
 
+
+    if (profileImage && profileImage.length > 0) {
+     
+
+      if (!validation.validImageType(profileImage[0].mimetype)) {
+        return res
+            .status(400)
+            .send({
+                status: false,
+                message: "Uploaded file should be in (jpeg/jpg/png) this format",
+            });
+    }
+
+
+      var uploadedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
+      
+    } else {
+      res.status(400).send({ msg: "No file found" });
+    }
+
+
     //  checking if mobile is unique or not.
     let checkMobile = await userModel.findOne({ phone: phone });
     if (checkMobile) {
@@ -207,25 +228,7 @@ const createUser = async function (req, res) {
 
     
 
-    if (profileImage && profileImage.length > 0) {
-     
-
-      if (!validation.validImageType(profileImage[0].mimetype)) {
-        return res
-            .status(400)
-            .send({
-                status: false,
-                message: "Uploaded file should be in (jpeg/jpg/png) this format",
-            });
-    }
-
-
-      var uploadedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
-      
-    } else {
-      res.status(400).send({ msg: "No file found" });
-    }
-
+   
     //console.log(uploadedProfilePictureUrl);
     // password encryption
     const salt = await bcrypt.genSalt(10);
