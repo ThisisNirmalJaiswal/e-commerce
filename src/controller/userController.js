@@ -134,10 +134,10 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "city is required" });
     }
 
-    if (validation.isValid(address.shipping.city))
+    if (!validation.isValidString(address.shipping.city))
     return res.status(400).send({
       status: false,
-      message: "shipping city can't be empty",
+      message: "shipping city is not valid",
     });
 
     if (!address.shipping.pincode) {
@@ -179,10 +179,10 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "city is required" });
     }
 
-    if (validation.isValid(address.billing.city))
+    if (!validation.isValidString(address.billing.city))
     return res.status(400).send({
       status: false,
-      message: "billing city can't be empty",
+      message: "billing city is not valid",
     });
 
     if (!address.billing.pincode) {
