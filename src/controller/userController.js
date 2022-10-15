@@ -278,14 +278,14 @@ const login = async function (req, res) {
   try {
     requestBody = req.body;
 
-    if ((Object.keys(requestBody).length = 0)) {
-      res.status(400).send({
+    if ((Object.keys(requestBody).length == 0)) {
+      return res.status(400).send({
         status: false,
         message: "please enter Email and Password to login ",
       });
     }
     if (Object.keys(requestBody).length > 2) {
-      res.status(400).send({
+     return res.status(400).send({
         status: false,
         message: "pls enter only email and password in the body",
       });
@@ -405,9 +405,7 @@ const updateUser = async function (req, res) {
 
     if (fname) {
 
-
-
-      if (validation.isValid(fname))
+      if (validation.isValid(fname ))
         return res.status(400).send({
           status: false,
           message: "Please!! provide First name",
@@ -570,10 +568,10 @@ const updateUser = async function (req, res) {
         
 
         if (address.shipping.pincode)
-          if (!validation.isValidPincode(address.billing.pincode)) {
+          if (!validation.isValidPincode(address.shipping.pincode)) {
             return res
               .status(400)
-              .send({ status: false, message: "Invalid pincode..." });
+              .send({ status: false, message: "Invalid shiping pincode..." });
           }
         filter["address.shipping.pincode"] = address.shipping.pincode;
       }
@@ -619,7 +617,7 @@ const updateUser = async function (req, res) {
     );
 
     return res.status(200).send({
-      message: "yess!!your details are updated successfully",
+      message: "Yess!! Your details are updated successfully",
       data: updatedUser,
     });
   } catch (err) {

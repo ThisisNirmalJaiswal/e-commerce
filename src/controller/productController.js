@@ -66,19 +66,13 @@ const createProduct = async function (req, res) {
       message: "Price is invalid",
     });
 
-      if ((currencyId==undefined)||!("INR").match(currencyId))
+      if ((currencyId!==undefined) && !(("INR").match(currencyId)) )
       return res.status(400).send({
         status: false,
-        message: "currencyId is invalid",
+        message: "currencyId INR is invalid",
       });
 
-      if (currencyId !== "INR") {
-        price = await Convert(Number(price)).from(currencyId).to("INR");
-        price = Math.ceil(price)
-        currencyId = "INR";
-    }
-
-      if ((currencyFormat==undefined)||!(("₹").match(currencyFormat)))
+      if ((currencyFormat !== undefined) && !(("₹").match(currencyFormat)))
       return res.status(400).send({
         status: false,
         message: "currencyformat is invalid",
@@ -147,6 +141,10 @@ const createProduct = async function (req, res) {
         }
     }
 
+
+    if (productImage && productImage.length > 0) {
+
+      
     if (!validation.validImageType(productImage[0].mimetype)) {
       return res
           .status(400)
@@ -155,12 +153,9 @@ const createProduct = async function (req, res) {
               message: "Uploaded file should be in (jpeg/jpg/png) this format",
           });}
 
-
-    if (productImage && productImage.length > 0) {
       
       console.log(productImage)
       var uploadedProfilePictureUrl = await AWS.uploadFile(productImage[0]);
-      //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
     } else {
       return res.status(400).send({ msg: "No file found" });
     }
@@ -226,10 +221,8 @@ const getProduct = async function (req, res) {
       query.installments = installments;
     }
     if (size) {
-      
-      const sizeArr = size
-        .split(",")
-        .map((x) => x.trim());
+      // console.log(size)
+      const sizeArr = size.split(",").map((x) => x.trim());
 
       query.availableSizes = { $all: sizeArr };
     }
@@ -311,11 +304,18 @@ const deleteProductById = async function (req, res) {
 
     let savedData = await productModel.findById(productId);
 
+
     //if it is already deleted
-    if (savedData.isDeleted)
+    if (!savedData)
       return res.status(404).send({
         status: false,
         message: "Product not found",
+      });
+
+  if (savedData.isDeleted === true)
+      return res.status(404).send({
+        status: false,
+        message: "Product deleted already",
       });
 
     // updating book.
@@ -552,8 +552,11 @@ try {
                     return res.status(400).send({ status: false, message: "Please Enter valid sizes, it should include only sizes from  (S,XS,M,X,L,XXL,XL) " })
             }
         }
-    
-        filter.availableSizes = availableSizes.concat(sizeArr.filter((item) => availableSizes.indexOf(item) < 0))
+        const proById = await productModel.findById(productIdFromParam)
+
+        let availSizes = proById.availableSizes
+ 
+         filter.availableSizes = availSizes.concat(sizeArr.filter((item) => availSizes.indexOf(item) < 0))
         
        }
 

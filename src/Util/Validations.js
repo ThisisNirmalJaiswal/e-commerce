@@ -21,7 +21,6 @@ const isValidBody = (reqBody) => {
 }
 
 const isValidString = (String) => {
-
   return /^[A-Z][a-z]*(?: [A-Z][a-z]*)*$/.test(String)
 }
 
@@ -35,7 +34,6 @@ const isValidEmail = (Email) => {
 
 const isValidPassword = (password) => {
   return (/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{8,15}$/.test(password))
- 
 };
 
 const isValidObjectId = function (objectId) {
