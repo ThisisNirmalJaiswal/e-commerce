@@ -72,11 +72,19 @@ const createProduct = async function (req, res) {
         message: "currencyId is invalid",
       });
 
+      if (currencyId !== "INR") {
+        price = await Convert(Number(price)).from(currencyId).to("INR");
+        price = Math.ceil(price)
+        currencyId = "INR";
+    }
+
       if ((currencyFormat==undefined)||!(("₹").match(currencyFormat)))
       return res.status(400).send({
         status: false,
         message: "currencyformat is invalid",
       });
+
+     
 
       if (validation.isValid(isFreeShipping))
       return res.status(400).send({

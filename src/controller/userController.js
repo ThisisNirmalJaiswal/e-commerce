@@ -122,17 +122,35 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "street is required" });
     }
 
+    if (validation.isValid(address.shipping.street))
+    return res.status(400).send({
+      status: false,
+      message: "shipping street can't be empty",
+    });
+
     if (!address.shipping.city) {
       return res
         .status(400)
         .send({ status: false, message: "city is required" });
     }
 
+    if (validation.isValid(address.shipping.city))
+    return res.status(400).send({
+      status: false,
+      message: "shipping city can't be empty",
+    });
+
     if (!address.shipping.pincode) {
       return res
         .status(400)
         .send({ status: false, message: "pincode is required" });
     }
+
+    if (validation.isValid(address.shipping.pincode))
+    return res.status(400).send({
+      status: false,
+      message: "shipping picode cant be empty",
+    });
 
     //  checking if pincode is valid or not.
     if (address.shipping && address.shipping.pincode && !validation.isValidPincode(address.shipping.pincode)) {
@@ -149,11 +167,23 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "street is required" });
     }
 
+    if (validation.isValid(address.billing.street))
+    return res.status(400).send({
+      status: false,
+      message: "billing street can't be empty",
+    });
+
     if (!address.billing.city) {
       return res
         .status(400)
         .send({ status: false, message: "city is required" });
     }
+
+    if (validation.isValid(address.billing.city))
+    return res.status(400).send({
+      status: false,
+      message: "billing city can't be empty",
+    });
 
     if (!address.billing.pincode) {
       return res
