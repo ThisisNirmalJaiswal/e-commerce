@@ -72,7 +72,7 @@ const createUser = async function (req, res) {
         .status(400)
         .send({ status: false, message: "User phone number is required" });
 
-    if (!validation.isValidPhone(data.phone)) {
+    if (!validation.isValidPhone(data.phone.trim())) {
       return res
         .status(400)
         .send({ status: false, message: "User phone number is not valid" });
@@ -174,12 +174,24 @@ const createUser = async function (req, res) {
     .status(400)
     .send({ status: false, message: "ProfileImage is Mandatory" });
 
+
+    
+
     if (profileImage && profileImage.length > 0) {
-      //upload to s3 and get the uploaded link
-      // res.send the link back to frontend/postman
-      //let uploadedFileURL= await uploadFile( files[0] )
+     
+
+      if (!validation.validImageType(profileImage[0].mimetype)) {
+        return res
+            .status(400)
+            .send({
+                status: false,
+                message: "Uploaded file should be in (jpeg/jpg/png) this format",
+            });
+    }
+
+
       var uploadedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
-      //res.status(201).send({msg: "file uploaded succesfully", data: uploadedProfilePictureUrl  })
+      
     } else {
       res.status(400).send({ msg: "No file found" });
     }
@@ -312,10 +324,26 @@ const updateUser = async function (req, res) {
 
     let { fname, lname, email, phone, password, address } = requestBody;
 
+    if ((validation.isValidBody(requestBody))&&(req.files==undefined))
+    return res.status(400).send({
+      status: false,
+      message: "Please!! provide required details to update your account",
+    });
+
     if (req.files) {
       let profileImage = req.files
 
       if (profileImage != undefined && profileImage.length > 0) {
+
+        if (!validation.validImageType(profileImage[0].mimetype)) {
+          return res
+              .status(400)
+              .send({
+                  status: false,
+                  message: "Uploaded file should be in (jpeg/jpg/png) this format",
+              });
+      }
+  
 
         var updatedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
 
@@ -323,9 +351,11 @@ const updateUser = async function (req, res) {
 
       filter.profileImage = updatedProfilePictureUrl;
     }
-
+    console.log(fname)
 
     if (fname) {
+
+
 
       if (validation.isValid(fname))
         return res.status(400).send({
@@ -362,19 +392,41 @@ const updateUser = async function (req, res) {
     }
 
 
-    if (email || phone) {
+    if (email) {
+
+      if (validation.isValid(email))
+        return res.status(400).send({
+          status: false,
+          message: "email must be contains only charachters",
+        });
+
 
       if (!validation.isValidEmail(email.trim())) {
         return res
           .status(400)
           .send({ status: false, message: "User email is not valid" });
       }
+      //console.log(email.trim())
+    }
+
+    if (phone){
+
+
+      if (validation.isValid(phone))
+      return res.status(400).send({
+        status: false,
+        message: "phone must be contains only charachters",
+      });
+
 
       if (!validation.isValidPhone(phone.trim())) {
         return res
           .status(400)
           .send({ status: false, message: "User phone number is not valid" });
       }
+
+    }
+      if(email||phone){
       //  checking if email is unique or not.
       const isUnique = await userModel.find({
         $or: [{ email: email }, { phone: phone }],
@@ -403,6 +455,12 @@ const updateUser = async function (req, res) {
     }
 
     if (password) {
+
+      if (validation.isValid(password))
+      return res.status(400).send({
+        status: false,
+        message: "password must be contains only charachters",
+      });
 
       if (!validation.isValidPassword(password)) {
         return res
@@ -433,11 +491,33 @@ const updateUser = async function (req, res) {
 
       if (address.shipping) {
 
-        if (address.shipping.street)
-          filter["address.shipping.street"] = address.shipping.street;
 
-        if (address.shipping.city)
+
+        if (address.shipping.street){
+
+          if (validation.isValid(address.shipping.street))
+          return res.status(400).send({
+            status: false,
+            message: "address.shipping.street must be contains only charachters",
+          });
+    
+              filter["address.shipping.street"] = address.shipping.street;
+
+        }
+
+       
+
+        if (address.shipping.city){
+
+          if (!validation.isValidString(address.shipping.city))
+          return res.status(400).send({
+            status: false,
+            message: "address.shipping.city must be contains only charachters",
+          });
+
           filter["address.shipping.city"] = address.shipping.city;
+        }
+        
 
         if (address.shipping.pincode)
           if (!validation.isValidPincode(address.billing.pincode)) {
@@ -452,9 +532,20 @@ const updateUser = async function (req, res) {
         if (address.billing.street)
           filter["address.billing.street"] = address.billing.street;
 
-        if (address.billing.city)
+        
+
+        if (address.billing.city){
+
+          if (!validation.isValidString(address.billing.city))
+          return res.status(400).send({
+            status: false,
+            message: "address.billing.city must be contains only charachters",
+          });
+
           filter["address.billing.city"] = address.billing.city;
 
+        }
+          
         if (address.billing.pincode)
           if (!validation.isValidPincode(address.billing.pincode)) {
             return res

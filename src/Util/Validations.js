@@ -22,7 +22,7 @@ const isValidBody = (reqBody) => {
 
 const isValidString = (String) => {
 
-  return /^[a-zA-Z]*$/.test(String)
+  return /^[A-Z][a-z]*(?: [A-Z][a-z]*)*$/.test(String)
 }
 
 const isValidPhone = (Mobile) => {

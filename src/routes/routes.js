@@ -23,8 +23,8 @@ router.put("/products/:productId", productController.updateProduct)
 router.delete("/products/:productId", productController.deleteProductById)
 
 
-router.all('*' ,function(req,res){
-    res.send("Shi API dal be")
-});
+// router.all('*' ,function(req,res){
+//     res.send("Shi API dal be")
+// });
 
 module.exports = router

@@ -60,22 +60,22 @@ const createProduct = async function (req, res) {
         });
 
    
-    if (!validation.isValidPrice(price))
+    if (!validation.isValidPrice(price.trim()))
     return res.status(400).send({
       status: false,
       message: "Price is invalid",
     });
 
-      if ((currencyId!=undefined)&&("₹").match(currencyId))
+      if ((currencyId==undefined)||!("INR").match(currencyId))
       return res.status(400).send({
         status: false,
         message: "currencyId is invalid",
       });
 
-      if ((currencyFormat!=undefined)&&("INR").match(currencyFormat))
+      if ((currencyFormat==undefined)||!(("₹").match(currencyFormat)))
       return res.status(400).send({
         status: false,
-        message: "currencyId is invalid",
+        message: "currencyformat is invalid",
       });
 
       if (validation.isValid(isFreeShipping))
@@ -188,7 +188,7 @@ const getProduct = async function (req, res) {
     let filter = req.query;
     let query = { isDeleted: false };
 
-    const { name, description, isFreeShipping, style, availableSizes, installments, priceGreaterThan, priceLessThan } =
+    const { name, description, isFreeShipping, style, size, installments, priceGreaterThan, priceLessThan } =
       filter;
 
     let nameIncludes = RegExp(`${filter.name}`);
@@ -198,6 +198,7 @@ const getProduct = async function (req, res) {
     if (name) {
       query.title = nameIncludes;
     }
+
     if (description) {
       query.description = description.trim();
     }
@@ -216,11 +217,9 @@ const getProduct = async function (req, res) {
     if (installments) {
       query.installments = installments;
     }
-    if (availableSizes) {
-
+    if (size) {
       
-
-      const sizeArr = availableSizes
+      const sizeArr = size
         .split(",")
         .map((x) => x.trim());
 
@@ -348,6 +347,13 @@ try {
       return res.status(404).send({ status: false, message: " Product not found!!!" })
     }
 
+    if(productById.isDeleted==true) {
+      return res.status(404).send({ status: false, message: " Product can't be found!!!" })
+    }
+
+
+    
+
   let filter = {isDeleted:false};
 
   let { title,
@@ -363,24 +369,26 @@ try {
     if ((validation.isValidBody(requestBody))&&(req.files==undefined))
     return res.status(400).send({
       status: false,
-      message: "Please!! provide required details to update your account",
+      message: "Please!! provide required details to update your product",
     });
 
   
     if (req.files) {
       let productImage = req.files
 
-      if (!validation.validImageType(productImage[0].mimetype)) {
-        return res
-            .status(400)
-            .send({
-                status: false,
-                message: "Uploaded file should be in (jpeg/jpg/png) this format",
-            });
-    }
+      
   
 
       if (productImage != undefined && productImage.length > 0) {
+
+        if (!validation.validImageType(productImage[0].mimetype)) {
+          return res
+              .status(400)
+              .send({
+                  status: false,
+                  message: "Uploaded file should be in (jpeg/jpg/png) this format",
+              });
+      }
 
         var updatedProductPictureUrl = await AWS.uploadFile(productImage[0]);
 
@@ -434,7 +442,7 @@ try {
 
     if (price) {
 
-      if (!validation.isValidPrice(price))
+      if (!validation.isValidPrice(price.trim()))
         return res.status(400).send({
           status: false,
           message: "Price is invalid",
@@ -446,6 +454,12 @@ try {
     }
 
     if (currencyId) {
+
+      if ((currencyId==undefined)||!(("INR").match(currencyId)))
+      return res.status(400).send({
+        status: false,
+        message: "currencyId is invalid",
+      });
 
       if (validation.isValid(currencyId))
       return res.status(400).send({
@@ -460,12 +474,19 @@ try {
 
     if (currencyFormat) {
 
+      if ((currencyFormat==undefined)||!(("₹").match(currencyFormat)))
+      return res.status(400).send({
+        status: false,
+        message: "currencyformat is invalid",
+      });
+
       if (validation.isValid(currencyFormat))
       return res.status(400).send({
         status: false,
         message: "currencyFormat can't be empty",
       });
 
+      
       // if (validation.isValidString(currencyFormat.trim()))
       // return res.status(400).send({
       //   status: false,
@@ -477,7 +498,7 @@ try {
 
      if(isFreeShipping){
 
-      console.log(typeof isFreeShipping)
+     
 
       if((isFreeShipping!="false") && (isFreeShipping!="true"))
       return res.status(400).send({
@@ -509,7 +530,7 @@ try {
           message: "style must be a string",
         });
 
-      filter.style = style
+      filter.style = style.trim()
     }
 
     if(availableSizes){
@@ -544,7 +565,11 @@ try {
     
 
       const updatedProduct = await productModel.findByIdAndUpdate({_id:productIdFromParam}, filter, {new:true})
+
+   
       return res.status(200).send({ status: true, message: 'Success', data: updatedProduct })
+
+      
     }
     catch (err) {
         return res.status(500).send({ err: err.message })
