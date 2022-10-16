@@ -12,7 +12,10 @@ const verifyToken = function (req, res, next) {
 
   if (bearerHeader) {
     const bearer = bearerHeader.split(' ');
+    
     const bearerToken = bearer[1];
+
+   
     req.token = bearerToken;
 
     next();
@@ -26,7 +29,7 @@ const authentication = function (req, res, next) {
 
   try {
     const decodedToken = jwt.verify(req.token, "project5", { ignoreExpiration: true })
-
+     console.log(Date.now())
     if (Date.now() > decodedToken.exp * 1000) {
       return res.status(401).send({ status: false, message: "Session Expired" })
     }

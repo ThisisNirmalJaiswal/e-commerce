@@ -605,7 +605,7 @@ const updateUser = async function (req, res) {
 
 
       if (Object.keys(filter).length === 0) {
-        return res.json("Please give something to update");
+        return res.status(400).send({status:false, message:"Please give something to update"});
       }
 
 

@@ -552,9 +552,9 @@ try {
                     return res.status(400).send({ status: false, message: "Please Enter valid sizes, it should include only sizes from  (S,XS,M,X,L,XXL,XL) " })
             }
         }
-        const proById = await productModel.findById(productIdFromParam)
+        
 
-        let availSizes = proById.availableSizes
+        let availSizes = productById.availableSizes
  
          filter.availableSizes = availSizes.concat(sizeArr.filter((item) => availSizes.indexOf(item) < 0))
         
