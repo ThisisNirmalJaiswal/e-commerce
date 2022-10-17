@@ -8,6 +8,7 @@ const cardSchema = new mongoose.Schema(
       {
         productId: { type:ObjectId, ref: "product", required: true },
         quantity: { type: Number, required: true },
+        _id:false
       },
     ],
     totalPrice: { type: Number, required: true },
