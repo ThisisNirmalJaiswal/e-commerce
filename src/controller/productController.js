@@ -242,7 +242,7 @@ const getProduct = async function (req, res) {
 
     if (data.length == 0) {
       return res
-        .status(400)
+        .status(404)
         .send({ status: false, message: "No data Found!!!" });
     }
 
@@ -326,7 +326,7 @@ const deleteProductById = async function (req, res) {
     );
 
     return res
-      .status(200)
+      .status(204)
       .send({ status: true, message: "Product deleted successfully", data: deleteProduct });
 
   } catch (err) {
@@ -382,11 +382,8 @@ try {
 
   
     if (req.files) {
-      let productImage = req.files
-
+      let productImage = req.files;
       
-  
-
       if (productImage != undefined && productImage.length > 0) {
 
         if (!validation.validImageType(productImage[0].mimetype)) {

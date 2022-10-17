@@ -1,5 +1,4 @@
 const userModel = require("../models/userModel");
-const aws = require("aws-sdk");
 const AWS = require("../awsfile/aws");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -113,7 +112,7 @@ const createUser = async function (req, res) {
     if (!validation.isValidPassword(data.password)) {
       return res
         .status(400)
-        .send({ status: false, message: "Please enter password in valid format" });
+        .send({ status: false, message: "Please enter password in valid format and password min length  must be 8 and max length must be 15" });
     }
 
     if (validation.isValid(address))
@@ -401,7 +400,6 @@ const updateUser = async function (req, res) {
 
       filter.profileImage = updatedProfilePictureUrl;
     }
-    console.log(fname)
 
     if (fname) {
 
