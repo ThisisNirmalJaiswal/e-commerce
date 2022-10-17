@@ -6,8 +6,8 @@ const cardSchema = new mongoose.Schema(
     userId: { type: ObjectId, ref: "user", required: true, unique: true },
     items: [
       {
-        productId: { ObjectId, ref: "product", requirement: true },
-        quantity: { type: Number, required: true, min: 1 },
+        productId: { ObjectId, ref: "product", required: true },
+        quantity: { type: Number, required: true },
       },
     ],
     totalPrice: { type: Number, required: true },
