@@ -13,7 +13,7 @@ const getCartDetails = async function (req, res) {
 
     let getCart = await cartModel
       .findOne({ userId: userId })
-      .populate("items.productId");
+      .populate(items.productId);
 
     if (!getCart) {
       return res.status(404).send({
