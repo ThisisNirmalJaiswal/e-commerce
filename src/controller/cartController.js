@@ -58,13 +58,13 @@ const createCart = async function (req, res) {
                 quantity: { $inc: +1 }
             }
 
-            const newItemInCart = await cartModel.findOneAndUpdate({ userId: userIdFromParam }, { $set: { items: [addedProduct] } }, { $inc: { totalItems: +1, totalPrice: +productById.price } }, { new: true })
-            let productDataAll = await cartModel.findOne({ userId: userIdFromParam }).populate('items.productId')
+            const newItemInCart = await cartModel.findOneAndUpdate({ userId: userIdFromParam }, { $set: { items: [addedProduct] } }, { $inc: { totalItems: +1, totalPrice: +productById.price } }, { new: true }).populate('items.productId')
+           
 
             return res.status(200).send({
                 status: true,
                 message: "Product added to cart",
-                data: productDataAll,
+                data: newItemInCart,
             });
         }
         //for checking if product exist in cart
@@ -78,22 +78,20 @@ const createCart = async function (req, res) {
 
                 const increasedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId }, {
                     $inc: { totalPrice: +productById.price, totalItems: +1, "items.$.quantity": +1 },
-                }, { new: true })
-                let productDataAll = await cartModel.findOne({ userId: userIdFromParam }).populate('items.productId')
-
+                }, { new: true }).populate('items.productId')
+                
                 return res.status(200)
-                    .send({ status: true, message: "Product quantity and price updated in the cart", data: productDataAll });
+                    .send({ status: true, message: "Product quantity and price updated in the cart", data: increasedProductQuantity });
             }
             //if provided product does not exist in cart
             if (productExistInCart == -1) {
                 const updatedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam },
-                    { $push: { items: { productId: productId, quantity: 1 } }, $inc: { totalPrice: +productById.price, totalItems: +1 }, }, { new: true })
+                    { $push: { items: { productId: productId, quantity: 1 } }, $inc: { totalPrice: +productById.price, totalItems: +1 }, }, { new: true }).populate('items.productId')
 
-                let productDataAll = await cartModel.findOne({ userId: userIdFromParam }).populate('items.productId')
-
+                
 
                 return res.status(200)
-                    .send({ status: true, message: "product updated to cart", data: productDataAll });
+                    .send({ status: true, message: "product updated to cart", data: updatedProductQuantity });
             }
         }
 
