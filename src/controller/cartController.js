@@ -18,147 +18,153 @@ const userModel = require("../models/userModel")
 // }
 
 const createCart = async function (req, res) {
-  try{
-  
+  try {
+
     let requestBody = req.body;
-  
+
     userIdFromParam = req.params.userId
 
-    let { cartId,productId  } = requestBody;
+    let { cartId, productId } = requestBody;
 
-     const productById = await productModel.findById(productId).lean()
-  if(!productById)
-  {
-    return res.status(404).send({ status: false, message: " product not found!!!" })
-  }
+    const productById = await productModel.findById(productId).lean()
+    if (!productById) {
+      return res.status(404).send({ status: false, message: " product not found!!!" })
+    }
 
-  if(productById.isDeleted==true)
-  {
-    return res.status(404).send({ status: false, message: " product is deleted!!!" })
-  }
+    if (productById.isDeleted == true) {
+      return res.status(404).send({ status: false, message: " product is deleted!!!" })
+    }
 
-  if (productById.installments === 0) {
-    return res
+    if (productById.installments === 0) {
+      return res
         .status(400)
         .send({ status: false, message: "product is out of stock" });
-}
+    }
 
 
 
-const userCart = await cartModel.findOne({userId:userIdFromParam}).lean()
+    const userCart = await cartModel.findOne({ userId: userIdFromParam }).lean()
 
-if(userCart._id!=cartId) {
-  return res
-      .status(400)
-      .send({ status: false, message: "cart doesnot exist" });
-}
-
-
-
-
-//ifcart does not exist for the user
-if(!userCart){
+   
     
 
-  let filter = {}
 
- let prodData = {productId:productById._id,quantity : 1}
-
-  filter.totalItems =  1
-  filter.totalPrice = productById.price
-  filter.userId =  userIdFromParam 
-  filter.items = [prodData]
+    //ifcart does not exist for the user
+    if (!userCart) {
 
 
-  const createdCart = await cartModel.create(filter)
+      let filter = {}
 
-  return res.status(200).send({
-    status: true,
-    message: "New cart created with products",
-    data:createdCart,
-});
+      let prodData = { productId: productById._id, quantity: 1 }
 
-}
-
-if(userCart.userId!=req.params.userId)
-return res.status(400).send({
-  status: false,
-  message: "your userId doesnot match with the uaer of cart"
-  
-});
+      filter.totalItems = 1
+      filter.totalPrice = productById.price
+      filter.userId = userIdFromParam
+      filter.items = [prodData]
 
 
+      const createdCart = await cartModel.create(filter)
 
-//if usercart is created but is empty
-if(userCart.items.length===0){
-const addedProduct = {productId:productById._id,
-quantity:{$inc:+1}
-}
+      return res.status(200).send({
+        status: true,
+        message: "New cart created with products",
+        data: createdCart,
+      });
 
-const newItemInCart = await cartModel.findOneAndUpdate({userId: userIdFromParam },{$set:{items:[addedProduct]}},{$inc:{totalItems:+1, totalPrice:+productById.price}}, {new:true})
+    }
 
-return res.status(200).send({
-  status: true,
-  message: "Product added to cart",
-  data: newItemInCart,
-});
-}
+    if (userCart._id != cartId) {
+      return res
+        .status(400)
+        .send({ status: false, message: "cart doesnot exist for this user" });
+    }
+
+
+    if (userCart.userId != req.params.userId)
+      return res.status(400).send({
+        status: false,
+        message: "your userId doesnot match with the uaer of cart"
+
+      });
 
 
 
+    //if usercart is created but is empty
+    if (userCart.items.length === 0) {
+      const addedProduct = {
+        productId: productById._id,
+        quantity: { $inc: +1 }
+      }
 
-//for checking if product exist in cart
-  {let productExistInCart = userCart.items.findIndex(items => items.productId == requestBody.productId);
+      const newItemInCart = await cartModel.findOneAndUpdate({ userId: userIdFromParam }, { $set: { items: [addedProduct] } }, { $inc: { totalItems: +1, totalPrice: +productById.price } }, { new: true })
 
-    console.log(productExistInCart)
-  
-     //if provided product does exist in cart
-       if (productExistInCart>-1){
+      return res.status(200).send({
+        status: true,
+        message: "Product added to cart",
+        data: newItemInCart,
+      });
+    }
 
-        
 
 
-        const increasedProductQuantity = await cartModel.findOneAndUpdate({userId:  userIdFromParam, "items.productId": productId} , {
+
+    //for checking if product exist in cart
+    {
+      let productExistInCart = userCart.items.findIndex(items => items.productId == requestBody.productId);
+
+      console.log(productExistInCart)
+
+      //if provided product does exist in cart
+      if (productExistInCart > -1) {
+
+
+
+
+        const increasedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId }, {
           $inc: {
-              totalPrice:+productById.price,
-              totalItems:+1,
-              "items.$.quantity": +1
-             },
-      }, { new: true });
-  
-      return res.status(200).send({
-        status: true,
-        message: "Product quantity and price updated in the cart",
-        data: increasedProductQuantity,
-    });
-       }
+            totalPrice: +productById.price,
+            totalItems: +1,
+            "items.$.quantity": +1
+          },
+        }, { new: true });
+
+        return res.status(200).send({
+          status: true,
+          message: "Product quantity and price updated in the cart",
+          data: increasedProductQuantity,
+        });
+      }
 
 
-       //if provided product does not exist in cart
-       if (productExistInCart == -1){
-
-        
-        const updatedProductQuantity = await cartModel.findOneAndUpdate({userId:  userIdFromParam } ,
-          {$push:{items:{productId:productId, quantity:1 }},
-          $inc: {totalPrice:+productById.price,
-            totalItems:+1 },}, { new: true });
-
-      
-      return res.status(200).send({
-        status: true,
-        message: "product updated to cart",
-        data: updatedProductQuantity,
-    });
-
-       }
-}
+      //if provided product does not exist in cart
+      if (productExistInCart == -1) {
 
 
+        const updatedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam },
+          {
+            $push: { items: { productId: productId, quantity: 1 } },
+            $inc: {
+              totalPrice: +productById.price,
+              totalItems: +1
+            },
+          }, { new: true });
 
-  
- } catch (err) {
-  return res.status(500).send({ status: false, error: err.message });
-}
+
+        return res.status(200).send({
+          status: true,
+          message: "product updated to cart",
+          data: updatedProductQuantity,
+        });
+
+      }
+    }
+
+
+
+
+  } catch (err) {
+    return res.status(500).send({ status: false, error: err.message });
+  }
 };
 
 //----------------------------------get cart details---------------------------------
@@ -174,7 +180,7 @@ const getCartDetails = async function (req, res) {
 
     let getCart = await cartModel
       .findOne({ userId: userId })
-      //.populate(items.productId);
+    //.populate(items.productId);
 
     if (!getCart) {
       return res.status(404).send({
@@ -221,4 +227,4 @@ const deleteCart = async function (req, res) {
   }
 };
 
-module.exports = {createCart, getCartDetails, deleteCart}
+module.exports = { createCart, getCartDetails, deleteCart }
