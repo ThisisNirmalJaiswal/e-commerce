@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const userController = require('../controller/userController')
 const productController = require('../controller/productController')
+const cartController = require('../controller/cartController')
 const auth = require('../auth/auth');
 const {
     Route53RecoveryControlConfig
@@ -27,6 +28,6 @@ router.delete("/products/:productId", productController.deleteProductById)
 
 //----------------------------------FEATURE III- Cart API-----------------------------------------
 
-//router.post("/users/:userId/cart",cardController.createCart)
+router.post("/users/:userId/cart", auth.verifyToken, auth.authentication, auth.authorization,cartController.createCart)
 
 module.exports = router

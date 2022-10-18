@@ -1,8 +1,7 @@
 //--------------------------------------Requiring Cart model from models-------------------------------------
 const cartModel = require("../models/cartModel");
 
-
-/*=========================================GET CART DETAILS=============================================*/
+//----------------------------------get cart details---------------------------------
 const getCartDetails = async function (req, res) {
   try {
 //--------------------------------------Request UserId from path Params-------------------------------------
@@ -12,13 +11,13 @@ const getCartDetails = async function (req, res) {
     if (!validation.isValidObjectId(userId)) {
       return res
         .status(400)
-        .send({ status: false, message: `${userId} not a valid productId` });
+        .send({ status: false, message: `${userId} not a valid userId` });
     }
 
 //--------------------------------------Finding cart by given UserId from Cart model-------------------------------------
     let getCart = await cartModel
       .findOne({ userId: userId })
-      .populate(items.productId);
+    .populate(items.productId);
 
 //--------------------------------------if there is no cart in database by given userId-------------------------------------
     if (!getCart) {
@@ -83,3 +82,5 @@ const deleteCart = async function (req, res) {
 
 /*==========================================EXPORTING ALL APIS HERE=============================================*/
 module.exports = { getCartDetails, deleteCart, createCart };
+
+module.exports = {getCartDetails, deleteCart}
