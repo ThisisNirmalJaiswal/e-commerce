@@ -244,10 +244,7 @@ const updateCart = async function (req, res) {
         .send({ status: false, message: " This product does not exist in cart" })
     }
 
-    var productData = userCart.items[productExistInCart]
-
-    console.log(productData)
-
+   
     if (productExistInCart > -1) {
 
       //chek the remove product key is 1
@@ -259,7 +256,7 @@ const updateCart = async function (req, res) {
 
           const deleteWholeProduct = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId },
             {
-              $pull: { items: {  productId: productId, quantity: 1 } },
+              $pull: { items: {  productId: productId, quantity: userCart.items[productExistInCart].quantity  } },
               $inc: { totalItems: -1, totalPrice: -productById.price },
             }, { new: true }).populate("items.productId")
 
@@ -293,8 +290,8 @@ const updateCart = async function (req, res) {
 
         const removeWholeProducts = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId },
           {
-            $pull: { items:   productData },
-            $inc: { totalItems: -(productData.quantity), totalPrice: -(productById.price *(productData.quantity)) },
+            $pull: { items:   {productId: productId, quantity: userCart.items[productExistInCart].quantity}},
+            $inc: { totalItems: -((userCart.items[productExistInCart]).quantity), totalPrice: -(productById.price *((userCart.items[productExistInCart]).quantity)) },
           }, { new: true }).populate("items.productId")
 
         return res.status(200).send({
