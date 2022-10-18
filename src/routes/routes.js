@@ -30,6 +30,7 @@ router.delete("/products/:productId", productController.deleteProductById)
 
 router.post("/users/:userId/cart", cartController.createCart);
 router.get("/users/:userId/cart", cartController.getCartDetails);
+router.put("/users/:userId/cart", cartController.updateCart);
 router.delete("/users/:userId/cart", cartController.deleteCart);
 
 module.exports = router;
