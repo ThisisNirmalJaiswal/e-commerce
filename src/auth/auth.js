@@ -29,7 +29,7 @@ const authentication = function (req, res, next) {
 
   try {
     const decodedToken = jwt.verify(req.token, "project5", { ignoreExpiration: true })
-     console.log(Date.now())
+
     if (Date.now() > decodedToken.exp * 1000) {
       return res.status(401).send({ status: false, message: "Session Expired" })
     }
@@ -43,7 +43,7 @@ const authentication = function (req, res, next) {
     next()
 
   } catch {
-    res.status(401).send({ status: false, message: "authentication failed" })
+   return res.status(401).send({ status: false, message: "authentication failed" })
   }
 
   
