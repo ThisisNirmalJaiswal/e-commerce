@@ -1,6 +1,7 @@
 //--------------------------------------Requiring Cart model from models-------------------------------------
 const cartModel = require("../models/cartModel");
-
+const productModel = require("../models/productModel");
+const validation = require("../Util/Validations")
 
 //==========================================create cart API===========================================
 
@@ -12,7 +13,10 @@ const createCart = async function (req, res) {
         userIdFromParam = req.params.userId
 
         let { cartId, productId } = requestBody;
-
+        
+        if (!validation.isValidObjectId(productId))
+        return res.status(400).send({ status: false, message: "Invalid productId" });
+  
         const productById = await productModel.findById(productId).lean()
         if (!productById) {
             return res.status(404).send({ status: false, message: " product not found!!!" })
@@ -27,6 +31,7 @@ const createCart = async function (req, res) {
                 .status(400)
                 .send({ status: false, message: "product is out of stock" });
         }
+ 
         const userCart = await cartModel.findOne({ userId: userIdFromParam })
         //ifcart does not exist for the use
         if (!userCart) {
@@ -53,13 +58,31 @@ const createCart = async function (req, res) {
         }
         //if usercart is created but is empty
         if (userCart.items.length === 0) {
-            const addedProduct = {
-                productId: productById,
-                quantity: { $inc: +1 }
-            }
+          const addedProduct = {
+            productId: productId,
+            quantity: 1,
+        };
 
-            const newItemInCart = await cartModel.findOneAndUpdate({ userId: userIdFromParam }, { $set: { items: [addedProduct] } }, { $inc: { totalItems: +1, totalPrice: +productById.price } }, { new: true }).populate('items.productId')
-           
+        const cartData = {
+            items: [addedProduct],
+            totalPrice: productById.price,
+            totalItems: 1,
+        };
+
+        const newItemInCart = await cartModel.findOneAndUpdate({ userId: userIdFromParam }, 
+          { $set: cartData } , { new: true }).populate('items.productId');
+
+
+            // const newItemInCart = await cartModel.findOneAndUpdate({ userId: userIdFromParam },
+            //  {  { $set: {items:{ addedProduct}} }, 
+            //    { $inc: { totalItems: +1, totalPrice: +productById.price } }, }, 
+            //    { new: true }).populate('items.productId')
+            // const newItemInCart = await cartModel.findOneAndUpdate({ userId: userIdFromParam }, 
+            //   { $set: { "items": addedProduct } , 
+            //     $inc: { totalItems: +1, totalPrice: +productById.price },} , { new: true }).populate('items.productId');
+
+
+
 
             return res.status(200).send({
                 status: true,
@@ -76,10 +99,11 @@ const createCart = async function (req, res) {
             //if provided product does exist in cart
             if (productExistInCart > -1) {
 
-                const increasedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId }, {
-                    $inc: { totalPrice: +productById.price, totalItems: +1, "items.$.quantity": +1 },
-                }, { new: true }).populate('items.productId')
-                
+              const increasedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId }, {
+                $inc: { totalPrice: +productById.price, totalItems: +1, "items.$.quantity": +1 },
+            }, { new: true }).populate('items.productId')
+
+
                 return res.status(200)
                     .send({ status: true, message: "Product quantity and price updated in the cart", data: increasedProductQuantity });
             }
@@ -87,8 +111,7 @@ const createCart = async function (req, res) {
             if (productExistInCart == -1) {
                 const updatedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam },
                     { $push: { items: { productId: productId, quantity: 1 } }, $inc: { totalPrice: +productById.price, totalItems: +1 }, }, { new: true }).populate('items.productId')
-
-                
+ 
 
                 return res.status(200)
                     .send({ status: true, message: "product updated to cart", data: updatedProductQuantity });
@@ -122,7 +145,7 @@ const getCartDetails = async function (req, res) {
 //--------------------------------------Finding cart by given UserId from Cart model-------------------------------------
     let getCart = await cartModel
       .findOne({ userId: userId })
-    .populate(items.productId);
+    .populate("items.productId");
 
 //--------------------------------------if there is no cart in database by given userId-------------------------------------
     if (!getCart) {
@@ -154,7 +177,7 @@ const deleteCart = async function (req, res) {
     let userId = req.params.userId;
 
 //--------------------------------------Finding the cart by the UserId-------------------------------------
-    let findCart = await Cart.findOne({ userId: userId });
+    let findCart = await cartModel.findOne({ userId: userId });
     if (!findCart)
       return res.status(404).send({
         status: false,
@@ -171,13 +194,13 @@ const deleteCart = async function (req, res) {
         });
 
 //--------------------------------------Updating cart items/ removing cart items-------------------------------------
-    await Cart.updateOne(
+   let cartData = await cartModel.updateOne(
       { _id: findCart._id },
       { items: [], totalPrice: 0, totalItems: 0 }
     );
 
 //--------------------------------------Response message-------------------------------------
-    return res.status(204).send({ status: true, message: "Success" });
+    return res.status(200).send({ status: true, message: "Successfully deleted" });
   } catch (err) {
     return res.status(500).send({ status: false, error: err.message });
   }

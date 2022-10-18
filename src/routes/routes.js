@@ -28,6 +28,8 @@ router.delete("/products/:productId", productController.deleteProductById)
 
 //----------------------------------FEATURE III- Cart API-----------------------------------------
 
-router.post("/users/:userId/cart", auth.verifyToken, auth.authentication, auth.authorization,cartController.createCart)
+router.post("/users/:userId/cart", cartController.createCart);
+router.get("/users/:userId/cart", cartController.getCartDetails);
+router.delete("/users/:userId/cart", cartController.deleteCart);
 
-module.exports = router
+module.exports = router;
