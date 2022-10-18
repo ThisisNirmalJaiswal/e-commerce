@@ -41,7 +41,7 @@ const getCartDetails = async function (req, res) {
 
 
 
-/*====   ======================================DELETE A CART API==========================================*/
+/*==========================================DELETE A CART API==========================================*/
 
 const deleteCart = async function (req, res) {
   try {
@@ -82,5 +82,3 @@ const deleteCart = async function (req, res) {
 
 /*==========================================EXPORTING ALL APIS HERE=============================================*/
 module.exports = { getCartDetails, deleteCart, createCart };
-
-module.exports = {getCartDetails, deleteCart}
