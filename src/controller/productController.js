@@ -270,7 +270,7 @@ const deleteProductById = async function (req, res) {
 
 //----------------------------------------------------------------
     return res
-      .status(200)
+      .status(204)
       .send({ status: true, message: "Product deleted successfully", data: deleteProduct });
 
   } catch (err) {

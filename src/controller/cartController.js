@@ -200,7 +200,7 @@ const deleteCart = async function (req, res) {
     );
 
 //--------------------------------------Response message-------------------------------------
-    return res.status(200).send({ status: true, message: "Successfully deleted" });
+    return res.status(204).send({ status: true, message: "Successfully deleted" });
   } catch (err) {
     return res.status(500).send({ status: false, error: err.message });
   }
