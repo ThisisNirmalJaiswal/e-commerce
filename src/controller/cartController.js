@@ -286,13 +286,15 @@ const updateCart = async function (req, res) {
         }
 
 
-      } if (removeProduct === 0) {
+      } 
+      //chek the remove product key is 0
+      if (removeProduct === 0) {
 
 
         const removeWholeProducts = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId },
           {
-            $pull: { items: { productId: productId, quantity: items.quantity } },
-            $inc: { totalItems: -(productData.quantity), totalPrice: -(productByProductId.price * quantity) },
+            $pull: { items:   productData },
+            $inc: { totalItems: -(productData.quantity), totalPrice: -(productById.price *(productData.quantity)) },
           }, { new: true }).populate("items.productId")
 
         return res.status(200).send({
