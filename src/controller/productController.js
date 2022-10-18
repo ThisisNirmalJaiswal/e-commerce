@@ -80,19 +80,11 @@ const createProduct = async function (req, res) {
 
      
 
-      if (validation.isValid(isFreeShipping))
-      return res.status(400).send({
-        status: false,
-        message: "isFreeShipping can't be empty",
-      });
-
 
       
-      if((isFreeShipping!="false") && (isFreeShipping!="true"))
-      return res.status(400).send({
-        status: false,
-        message: "isFreeShipping must be either true or false",
-      });
+      if((isFreeShipping!="false") && (isFreeShipping!="true") && (isFreeShipping!=undefined))
+      return res.status(400).send({ status: false, message: "isFreeShipping must be either true or false" });
+
 
 
       if(isFreeShipping=="false"){
