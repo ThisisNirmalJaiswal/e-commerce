@@ -12,7 +12,7 @@
         totalItems: {type:Number, required:true, trim:true, },
         totalQuantity: {type:Number, required:true, trim:true,},
         cancellable: {type:Boolean, default: true, trim:true},
-        status: {type:String, default: 'pending', trim:true, enum:["pending", "completed", "cancled"]},
+        status: {type:String, default: 'pending', trim:true, enum:["pending", "completed", "cancelled"]},
         deletedAt: {type:Date}, 
         isDeleted: {type:Boolean, default: false},
         },{timestamps:true});
