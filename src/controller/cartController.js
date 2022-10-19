@@ -91,7 +91,7 @@ const createCart = async function (req, res) {
       if (productExistInCart > -1) {
 
         const increasedProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId }, {
-          $inc: { totalPrice: +productById.price, totalItems: +1, "items.$.quantity": +1 },
+          $inc: { totalPrice: +productById.price, "items.$.quantity": +1 },
         }, { new: true }).populate('items.productId')
 
 
@@ -272,7 +272,7 @@ const updateCart = async function (req, res) {
         if (userCart.items[productExistInCart].quantity > 1) {
 
           const reduceProductQuantity = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId },
-            { $inc: { totalItems: -1, totalPrice: -productById.price, "items.$.quantity": -1 } }, { new: true }).populate("items.productId");
+            { $inc: {  totalPrice: -productById.price, "items.$.quantity": -1 } }, { new: true }).populate("items.productId");
 
 
           return res.status(200).send({
@@ -291,7 +291,7 @@ const updateCart = async function (req, res) {
         const removeWholeProducts = await cartModel.findOneAndUpdate({ userId: userIdFromParam, "items.productId": productId },
           {
             $pull: { items:   {productId: productId, quantity: userCart.items[productExistInCart].quantity}},
-            $inc: { totalItems: -((userCart.items[productExistInCart]).quantity), totalPrice: -(productById.price *((userCart.items[productExistInCart]).quantity)) },
+            $inc: { totalItems: -1, totalPrice: -(productById.price *((userCart.items[productExistInCart]).quantity)) },
           }, { new: true }).populate("items.productId")
 
         return res.status(200).send({
