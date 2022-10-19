@@ -47,7 +47,7 @@ const createCart = async function (req, res) {
 
       let productDataAll = await cartModel.findOne({ userId: userIdFromParam }).populate('items.productId')
 
-      return res.status(200)
+      return res.status(201)
         .send({ status: true, message: "New cart created with products", data: productDataAll, });
 
     }
