@@ -37,5 +37,6 @@ router.delete("/users/:userId/cart", cartController.deleteCart);
 
 //----------------------------------FEATURE IV- order API-----------------------------------------
 router.post("/users/:userId/orders", orderController.createOrder);
+router.put("/users/:userId/orders", orderController.updateOrder);
 
 module.exports = router;
