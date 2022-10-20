@@ -29,14 +29,14 @@ router.delete("/products/:productId", productController.deleteProductById)
 
 //----------------------------------FEATURE III- Cart API-----------------------------------------
 
-router.post("/users/:userId/cart", cartController.createCart);
-router.get("/users/:userId/cart", cartController.getCartDetails);
-router.put("/users/:userId/cart", cartController.updateCart);
-router.delete("/users/:userId/cart", cartController.deleteCart);
+router.post("/users/:userId/cart",auth.verifyToken, auth.authentication, auth.authorization, cartController.createCart);
+router.get("/users/:userId/cart",auth.verifyToken, auth.authentication, auth.authorization, cartController.getCartDetails);
+router.put("/users/:userId/cart",auth.verifyToken, auth.authentication, auth.authorization, cartController.updateCart);
+router.delete("/users/:userId/cart",auth.verifyToken, auth.authentication, auth.authorization, cartController.deleteCart);
 
 
 //----------------------------------FEATURE IV- order API-----------------------------------------
-router.post("/users/:userId/orders", orderController.createOrder);
-router.put("/users/:userId/orders", orderController.updateOrder);
+router.post("/users/:userId/orders", auth.verifyToken, auth.authentication, auth.authorization, orderController.createOrder);
+router.put("/users/:userId/orders", auth.verifyToken, auth.authentication, auth.authorization, orderController.updateOrder);
 
 module.exports = router;

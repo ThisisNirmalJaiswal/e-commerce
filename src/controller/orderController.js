@@ -9,6 +9,13 @@ const createOrder = async function (req, res) {
     let requestBody = req.body;
     let { cartId, cancellable } = requestBody;
 
+    if (validation.isValidBody(requestBody)) {
+      return res
+        .status(400)
+        .send({ status: false, message: "createorder data is required " });
+    }
+
+
     if (!isValidObjectId(cartId))
       return res
         .status(400)
@@ -52,7 +59,7 @@ const createOrder = async function (req, res) {
             message: "cancellable must be either true or false",
           });
 
-      cancellable = cancellable;
+      cancellable = requestBody.cancellable;
     }
 
     const orderDetails = {
