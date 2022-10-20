@@ -127,21 +127,31 @@ const updateOrder = async function (req, res) {
     }
 // console.log(checkOrder)
 
+
+console.log(checkOrder.status)
+if(checkOrder.cancellable === true && requestBody.status==="cancelled"){
+  const updateStatus = await orderModel.findOneAndUpdate(
+    { _id: orderId },
+    { $set: { status: "cancelled" } },
+    { new: true }
+  );
+  return res.status(200).send({status:true, message:"Order cancelled", data:updateStatus})
+}
+
     if (checkOrder.status === "completed") {
       return res.status(400).send({
         status: false,
         message: "Order completed, now its status can not be updated",
       });
     }
-console.log(requestBody.status)
-    if(checkOrder.cancellable === true){
-      const updateStatus = await orderModel.findOneAndUpdate(
-        { _id: orderId },
-        { $set: { status: "cancelled" } },
-        { new: true }
-      );
-      return res.status(200).send({status:true, message:"Order cancelled", data:updateStatus})
+
+    if (checkOrder.status === "cancelled" && requestBody.status==="pending") {
+      return res.status(400).send({
+        status: false,
+        message: "you have already cancelled this order",
+      });
     }
+         
 
     if (status === "cancelled" && checkOrder.cancellable === false) {
       return res
