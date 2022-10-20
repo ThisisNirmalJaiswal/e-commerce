@@ -2,17 +2,16 @@
 const jwt = require("jsonwebtoken")
 const userModel = require("../models/userModel")
 const mongoose = require("mongoose")
+const { isValidObjectId } = require("mongoose");
 
-const isValidObjectId = function (objectid) {
-  return mongoose.Types.ObjectId.isValid(objectid)
-}
 
 const verifyToken = function (req, res, next) {
   const bearerHeader = req.headers['authorization'];
 
   if (bearerHeader) {
+   // console.log(bearerHeader)
     const bearer = bearerHeader.split(' ');
-    
+   // console.log(bearer)
     const bearerToken = bearer[1];
 
    
@@ -28,12 +27,12 @@ const verifyToken = function (req, res, next) {
 const authentication = function (req, res, next) {
 
   try {
-    const decodedToken = jwt.verify(req.token, "project5", { ignoreExpiration: true })
+    const decodedToken = jwt.verify(req.token, "project5")
 
     if (Date.now() > decodedToken.exp * 1000) {
       return res.status(401).send({ status: false, message: "Session Expired" })
     }
-    console.log(decodedToken)
+    //console.log(decodedToken)
 
     req.decodedToken = decodedToken
     req["tokenUserId"] = decodedToken.userId

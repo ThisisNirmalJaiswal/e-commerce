@@ -29,7 +29,7 @@ const createProduct = async function (req, res) {
     return res.status(400).send({status: false, message: "Please!! provide required details to create product" });
 
 //--------------------------------------validation for title-------------------------------------
-    if (validation.isValid(title.trim()))
+    if (validation.isValid(title))
     return res.status(400).send({status: false, message: "title can't be empty" });
 
 //--------------------------------------Validation for title must be a string value-------------------------------------
@@ -53,15 +53,32 @@ const createProduct = async function (req, res) {
     if (!validation.isValidPrice(price.trim()))
     return res.status(400).send({ status: false, message: "Price is invalid" });
 //--------------------------------------Validation for CurrencyId-------------------------------------
-      if ((currencyId!==undefined) && !(("INR").match(currencyId)))
-      return res.status(400).send({ status: false, message: "currencyId INR is invalid"});
+
+console.log(typeof currencyId)
+if  (typeof currencyId === "string" && currencyId.trim().length === 0)
+    return res.status(400).send({status: false, message: "currency id is tickmarked but empty" });
+
+
+if ((currencyId!==undefined) && !(("INR").match(currencyId)))
+      return res.status(400).send({ status: false, message: "currencyId is invalid"});
 
 //--------------------------------------Validation for Currency formart-------------------------------------
-      if ((currencyFormat !== undefined) && !(("₹").match(currencyFormat)))
+
+
+if  (typeof currencyFormat === "string" && currencyFormat.trim().length === 0)
+    return res.status(400).send({status: false, message: "currencyformat is tickmarked but empty" });
+    
+
+
+if ((currencyFormat !== undefined) && !(("₹").match(currencyFormat)))
       return res.status(400).send({ status: false, message: "currencyformat is invalid" });
 
 //--------------------------------------Validation for isFreeShipping Boolean Type-------------------------------------
-      if((isFreeShipping!="false") && (isFreeShipping!="true") && (isFreeShipping!=undefined))
+     
+if  (typeof isFreeShipping === "string" && isFreeShipping.trim().length === 0)
+return res.status(400).send({ status: false, message: "isFreeShipping is tickmarked but empty" });
+
+if((isFreeShipping!="false") && (isFreeShipping!="true") && (isFreeShipping!=undefined))
       return res.status(400).send({ status: false, message: "isFreeShipping must be either true or false" });
 
 //--------------------------------------If isFreeShipping is false -------------------------------------      
@@ -110,7 +127,7 @@ const createProduct = async function (req, res) {
         }
 
 //-------------------------------Uploading Product image to aws S3 cloud service-------------------------------------
-      console.log(productImage)
+      
       var uploadedProfilePictureUrl = await AWS.uploadFile(productImage[0]);
     } else {
 //----------------------------if image not found return a error message -------------------------------------         

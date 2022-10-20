@@ -73,19 +73,7 @@ const createUser = async function (req, res) {
         .status(400)
         .send({ status: false, message: "User phone number is not valid" });
     };
-//--------------------------------------validating empty body-------------------------------------
-    if (profileImage && profileImage.length > 0) {
-      if (!validation.validImageType(profileImage[0].mimetype)) {
-        return res.status(400).send({
-          status: false,
-          message: "Uploaded file should be in (jpeg/jpg/png) this format",
-        });
-      };
-//--------------------------------------validating empty body-------------------------------------
-      var uploadedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
-    } else {
-      res.status(400).send({ msg: "No file found" });
-    }
+
 
 //--------------------------------------validating empty body-------------------------------------
 
@@ -241,6 +229,22 @@ const createUser = async function (req, res) {
         .send({ status: false, message: "ProfileImage is Mandatory" });
 
     //console.log(uploadedProfilePictureUrl);
+
+
+//--------------------------------------validating empty body-------------------------------------
+if (profileImage && profileImage.length > 0) {
+  if (!validation.validImageType(profileImage[0].mimetype)) {
+    return res.status(400).send({
+      status: false,
+      message: "Uploaded file should be in (jpeg/jpg/png) this format",
+    });
+  };
+//--------------------------------------validating empty body-------------------------------------
+  var uploadedProfilePictureUrl = await AWS.uploadFile(profileImage[0]);
+} else {
+  res.status(400).send({ msg: "No file found" });
+}
+
     // password encryption
 //--------------------------------------validating empty body-------------------------------------
     const salt = await bcrypt.genSalt(10);

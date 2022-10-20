@@ -112,7 +112,7 @@ const updateOrder = async function (req, res) {
     if (!isValidObjectId(orderId))
       return res
         .status(400)
-        .send({ status: false, message: `Invalid orderId ${orderId} !` });
+        .send({ status: false, message: `Invalid orderId ${requestBody.orderId} !` });
 
     let checkOrder = await orderModel.findOne({
       _id: requestBody.orderId,
@@ -120,6 +120,15 @@ const updateOrder = async function (req, res) {
     });
     if (!checkOrder)
       return res
+        .status(400)
+        .send({
+          status: false,
+          message: `No order found by this UserId: ${requestBody.orderId} !`,
+        });
+
+
+        if(checkOrder.userId!=userIdFromParam)
+        return res
         .status(400)
         .send({
           status: false,
@@ -135,7 +144,7 @@ const updateOrder = async function (req, res) {
 // console.log(checkOrder)
 
 
-console.log(checkOrder.status)
+
 if(checkOrder.cancellable === true && requestBody.status==="cancelled"){
   const updateStatus = await orderModel.findOneAndUpdate(
     { _id: orderId },

@@ -36,7 +36,7 @@ router.delete("/users/:userId/cart",auth.verifyToken, auth.authentication, auth.
 
 
 //----------------------------------FEATURE IV- order API-----------------------------------------
-router.post("/users/:userId/orders", auth.verifyToken, auth.authentication, auth.authorization, orderController.createOrder);
+router.post("/users/:userId/orders",auth.verifyToken, auth.authentication, auth.authorization, orderController.createOrder);
 router.put("/users/:userId/orders", auth.verifyToken, auth.authentication, auth.authorization, orderController.updateOrder);
 
 module.exports = router;
