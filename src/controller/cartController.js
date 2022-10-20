@@ -32,11 +32,7 @@ const createCart = async function (req, res) {
       return res.status(404).send({ status: false, message: " product is deleted!!!" })
     }
 
-    if (productById.installments === 0) {
-      return res
-        .status(400)
-        .send({ status: false, message: "product is out of stock" });
-    }
+    
 
     if (cartId && !validation.isValidObjectId(cartId))
       return res.status(400).send({ status: false, message: "Invalid cartId" });
@@ -52,7 +48,7 @@ const createCart = async function (req, res) {
     }
 
     //if cartId is not given and cart is found byb userId from params
-    if((!cartId) && userCart){ return res.status(200).send({
+    if((!cartId) && userCart){ return res.status(400).send({
       status: true,
       message: "Cart exist by this user please provide cartid",
      
@@ -61,13 +57,13 @@ const createCart = async function (req, res) {
 
     //if cartId is given but cart found by the userId does not match with the cartId from rreqbody
     if (userCart && userCart._id!=cartId) {
-      return res.status(404).send({ status: false, message: " Please give correct cartId" })
+      return res.status(400).send({ status: false, message: " Please give correct cartId" })
     }
 
     //if cartId is given but cart found by the userId does not match with the cartId from rreqbody
    
     if (cartId  && userCart._id!=cartId) {
-      return res.status(404).send({ status: false, message: " hey!!dont give others cartId!!!!" })
+      return res.status(400).send({ status: false, message: " hey!!dont give others cartId!!!!" })
     }
    
     //ifcart does not exist for the user and cartId is not given
@@ -262,7 +258,7 @@ const updateCart = async function (req, res) {
     }
 
     if (requestBody.removeProduct !== 0 &&requestBody. removeProduct !== 1) {
-      return res.status(404).send({ status: false, message: " removeProduct must be either 0 or 1" })
+      return res.status(400).send({ status: false, message: " removeProduct must be either 0 or 1" })
     }
 
    

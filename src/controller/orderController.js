@@ -24,7 +24,7 @@ const createOrder = async function (req, res) {
     let checkCart = await cartModel.findOne({ userId: userIdFromParam }).lean();
     if (!checkCart)
       return res
-        .status(400)
+        .status(404)
         .send({
           status: false,
           message: `No cart found by this UserId: ${userIdFromParam} !`,
@@ -37,6 +37,7 @@ const createOrder = async function (req, res) {
           status: false,
           message: "You have no products in your cart!!",
         });
+
     if (checkCart._id != cartId)
       return res
         .status(400)
@@ -47,7 +48,7 @@ const createOrder = async function (req, res) {
     const x = checkCart.items.forEach((ele) => {
       sum += ele.quantity;
     });
-    console.log(sum);
+    
     const totalproducts = sum;
 
     if (cancellable) {
@@ -120,7 +121,7 @@ const updateOrder = async function (req, res) {
     });
     if (!checkOrder)
       return res
-        .status(400)
+        .status(404)
         .send({
           status: false,
           message: `No order found by this UserId: ${requestBody.orderId} !`,
@@ -129,7 +130,7 @@ const updateOrder = async function (req, res) {
 
         if(checkOrder.userId!=userIdFromParam)
         return res
-        .status(400)
+        .status(404)
         .send({
           status: false,
           message: `No order found by this UserId: ${userIdFromParam} !`,

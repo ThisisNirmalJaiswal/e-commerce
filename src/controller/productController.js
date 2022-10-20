@@ -45,16 +45,13 @@ const createProduct = async function (req, res) {
     if (validation.isValid(description.trim()))
         return res.status(400).send({status: false, message: "description can't be empty" });
 
-//--------------------------------------validating empty body-------------------------------------
-      if (!validation.isValidCompString(description.trim()))
-        return res.status(400).send({ status: false, message: "description must be a string"});
-
+   
 //--------------------------------------Validation for Price Value-------------------------------------
     if (!validation.isValidPrice(price.trim()))
     return res.status(400).send({ status: false, message: "Price is invalid" });
 //--------------------------------------Validation for CurrencyId-------------------------------------
 
-console.log(typeof currencyId)
+
 if  (typeof currencyId === "string" && currencyId.trim().length === 0)
     return res.status(400).send({status: false, message: "currency id is tickmarked but empty" });
 
@@ -131,7 +128,7 @@ if((isFreeShipping!="false") && (isFreeShipping!="true") && (isFreeShipping!=und
       var uploadedProfilePictureUrl = await AWS.uploadFile(productImage[0]);
     } else {
 //----------------------------if image not found return a error message -------------------------------------         
-      return res.status(400).send({ msg: "No file found" });
+      return res.status(404).send({ msg: "No file found" });
     };
   
 //--------------------------------------Validating the given data-------------------------------------
@@ -460,12 +457,7 @@ try {
       });
 
       
-      // if (validation.isValidString(currencyFormat.trim()))
-      // return res.status(400).send({
-      //   status: false,
-      //   message: "currencyFormat must be a string",
-      // });
-
+     
       filter.currencyFormat = currencyFormat
     }
 
